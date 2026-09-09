@@ -33,6 +33,53 @@ modelos cinco veces mayores. Ahí es donde los locales se separan.
 En CPU pura responde en segundos, no al instante. Es esperable y hay que
 advertirlo a la sala.
 
+### Afinar el modelo — sin tocar la detección
+
+Los valores por omisión de Ollama están pensados para conversación, no para
+análisis forense. Dejarlos como vienen produce fallas que **parecen del modelo
+y son de configuración**:
+
+| Parámetro | Por omisión | Qué provoca aquí |
+|---|---|---|
+| `num_ctx` | **2048 tokens** | La salida de `tshark` desborda el contexto y el modelo pierde la evidencia a media sesión |
+| `temperature` | **0.8** | Ajuste para escritura creativa. Fabrica justo la confabulación que el taller enseña a detectar |
+
+Un solo `tshark -V` de una trama ya son cientos de tokens, y una línea de tiempo
+de 216 tramas no cabe ni de lejos en 2048. El modelo se queda sin evidencia,
+y como no sabe decir "se me olvidó", rellena. Culparlo de eso sería injusto.
+
+`setup/Modelfile` construye una variante afinada:
+
+```bash
+ollama create triton-analista -f setup/Modelfile
+ollmcp --model triton-analista --mcp-server <tu-config>
+```
+
+Qué cambia, y por qué cada cosa:
+
+- **`num_ctx 8192`** — alcanza para el flujo del workbook. Con 16 GB de RAM
+  puedes subirlo a 16384; el costo en memoria del caché de atención crece
+  rápido, así que no más de lo que la máquina aguante.
+- **`temperature 0.1` y `seed 42`** — dos corridas sobre la misma evidencia dan
+  prácticamente la misma respuesta. Eso hace el taller reproducible y hace que
+  el video de respaldo se parezca a lo que ve la sala.
+- **Un `SYSTEM` con las reglas de anclaje** ya incorporadas, más la instrucción
+  de llamar **una herramienta a la vez**. Esto último ataca una debilidad
+  conocida de los modelos locales pequeños: encadenan llamadas en paralelo
+  cuando cada paso depende del anterior.
+- **Una tabla de códigos de comando de TriStation**, que es la misma traducción
+  que el disector ya imprime. Está ahí para no gastar consultas releyéndola.
+
+**Dónde está la línea.** El `SYSTEM` da **referencia de protocolo**, no
+respuestas. Los códigos de comando son lo que el disector muestra de todas
+formas, y para descubrir qué campos existen le dice al modelo que corra
+`tshark -V` — no se los lista. No menciona el `keyState`, ni las tramas 75 y
+887, ni que el `Run program` final fue rechazado. Eso lo tiene que encontrar.
+
+Es la misma información que un participante humano tiene a la mano en `docs/`.
+La diferencia es que el humano sabe leer un protocolo industrial y el modelo
+no ha visto TriStation nunca.
+
 > **Un efecto secundario que conviene conocer:** un modelo de 4B sabe bastante
 > menos de TRITON que uno de frontera. Eso hace el análisis a ciegas más limpio
 > —hay menos que recitar— pero debilita el experimento de contaminación de

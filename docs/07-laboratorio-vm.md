@@ -207,7 +207,22 @@ fallan más que este pequeño.
 En CPU pura, un modelo de 4B responde en segundos, no al instante. Adviértelo a
 la sala: la espera es normal y no es que se haya trabado.
 
-### 7.3 El cliente MCP
+### 7.3 Afinar el modelo
+
+Los valores por omisión de Ollama (2048 tokens de contexto, temperatura 0.8)
+hacen fallar este laboratorio por razones que no son del modelo. `setup/Modelfile`
+los corrige:
+
+```bash
+ollama create triton-analista -f setup/Modelfile
+ollama list      # debe aparecer triton-analista
+```
+
+El detalle de qué cambia y por qué está en `06-herramientas.md`. Lo importante:
+**no toca el disector, la evidencia ni la detección de TRITON.** Sólo configura
+al analista.
+
+### 7.4 El cliente MCP
 
 ```bash
 pip install --user --upgrade ollmcp
@@ -217,7 +232,7 @@ pip install --user --upgrade ollmcp
 stdio, maneja el ciclo de llamada a herramientas y tiene modo agente y
 confirmación humana. Requiere Python 3.11 o superior.
 
-### 7.4 El servidor MCP de tshark
+### 7.5 El servidor MCP de tshark
 
 Elige uno de los de `06-herramientas.md` y **fíjalo con semanas de antelación.**
 No cambies de servidor MCP la semana del evento.
@@ -232,7 +247,7 @@ de traer su propio parser, para que herede el disector sin escribir código.
 Configúralo tomando `setup/mcp-config.example.json` como base, con rutas
 absolutas.
 
-### 7.5 La validación
+### 7.6 La validación
 
 Con todo arriba, arranca el cliente apuntando al servidor MCP y hazle la
 pregunta de control:
@@ -254,7 +269,7 @@ Dos formas de fallar, y conviene distinguirlas:
   en la validación lo va a hacer toda la sesión. Cambia de modelo antes de
   seguir.
 
-### 7.6 Si el modelo local no da el ancho
+### 7.7 Si el modelo local no da el ancho
 
 No lo fuerces. La ruta con un proveedor en la nube sigue siendo válida y está
 documentada en `06-herramientas.md`. Perderías la independencia de la red del

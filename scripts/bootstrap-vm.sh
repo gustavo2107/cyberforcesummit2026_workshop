@@ -147,6 +147,17 @@ else
     fi
   fi
 
+  # Variante afinada para trabajo forense.
+  # Los valores por omision de Ollama (num_ctx 2048, temperature 0.8) hacen
+  # fallar este laboratorio por razones de configuracion, no del modelo.
+  if command -v ollama >/dev/null 2>&1 && [[ -f "${REPO_ROOT}/setup/Modelfile" ]]; then
+    if ollama create triton-analista -f "${REPO_ROOT}/setup/Modelfile" >/dev/null 2>&1; then
+      ok "modelo afinado 'triton-analista' creado"
+    else
+      warn "no se pudo crear el modelo afinado; usa ${MODELO} directamente"
+    fi
+  fi
+
   # Cliente MCP para Ollama
   if pip3 install --user --quiet --upgrade ollmcp 2>/dev/null; then
     ok "ollmcp instalado (cliente MCP para modelos locales)"
@@ -179,7 +190,7 @@ Siguiente paso: conectar el servidor MCP de tshark.
   1. Elige un servidor MCP  ->  docs/06-herramientas.md
   2. Configuralo            ->  setup/mcp-config.example.json
   3. Arranca el cliente:
-       ollmcp --model qwen3.5:4b --mcp-server <tu-config>
+       ollmcp --model triton-analista --mcp-server <tu-config>
   4. Validalo con la pregunta de control:
        "Corre: tshark -r malware_exec.pcap -c 1 y dime el protocolo"
 

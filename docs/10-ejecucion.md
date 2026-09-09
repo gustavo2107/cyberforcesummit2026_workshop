@@ -64,7 +64,7 @@ externo y la evidencia nunca sale de la máquina.
 ### 3.1 Confirmar que el modelo está arriba
 
 ```bash
-ollama list          # debe aparecer qwen3.5:4b
+ollama list          # debe aparecer triton-analista
 ollama ps            # muestra si ya está cargado en memoria
 ```
 
@@ -72,14 +72,14 @@ Si no está cargado, la primera respuesta de la sesión va a tardar más mientra
 se carga. Conviene "calentarlo" antes de que llegue la gente:
 
 ```bash
-ollama run qwen3.5:4b "responde solo: listo" --verbose
+ollama run triton-analista "responde solo: listo" --verbose
 ```
 
 ### 3.2 Arrancar el cliente MCP
 
 ```bash
 cd ~/taller
-ollmcp --model qwen3.5:4b --mcp-server <config-del-servidor-tshark>
+ollmcp --model triton-analista --mcp-server <config-del-servidor-tshark>
 ```
 
 Los parámetros exactos dependen del servidor MCP que hayas fijado. Toma

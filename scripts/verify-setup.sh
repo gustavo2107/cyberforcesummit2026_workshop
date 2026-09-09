@@ -65,8 +65,12 @@ if command -v ollama >/dev/null 2>&1; then
   ok "ollama encontrado"
   if curl -sf http://localhost:11434/api/tags >/dev/null 2>&1; then
     ok "servicio de ollama respondiendo en localhost:11434"
-    if ollama list 2>/dev/null | grep -q "^${MODELO%%:*}"; then
-      ok "modelo ${MODELO} disponible"
+    if ollama list 2>/dev/null | grep -q "^triton-analista"; then
+      ok "modelo afinado 'triton-analista' disponible"
+    elif ollama list 2>/dev/null | grep -q "^${MODELO%%:*}"; then
+      ok "modelo base ${MODELO} disponible"
+      echo "[--] falta el afinado — ollama create triton-analista -f setup/Modelfile"
+      echo "     Sin afinar, num_ctx=2048 y temperature=0.8 hacen fallar el analisis."
     else
       echo "[--] modelo ${MODELO} no descargado — ollama pull ${MODELO}"
     fi

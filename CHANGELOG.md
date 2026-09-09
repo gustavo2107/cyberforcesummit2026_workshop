@@ -2,6 +2,31 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.10.0] — 2026-09-09
+
+### Agregado
+- `setup/Modelfile` — variante afinada del modelo para trabajo forense. Los
+  valores por omisión de Ollama hacen fallar este laboratorio por razones de
+  configuración, no del modelo:
+  - `num_ctx` por omisión es **2048 tokens**. Un solo `tshark -V` ya son
+    cientos, y una línea de tiempo de 216 tramas no cabe: el modelo pierde la
+    evidencia a media sesión y, como no sabe decir "se me olvidó", rellena
+  - `temperature` por omisión es **0.8**, un ajuste para escritura creativa que
+    fabrica justo la confabulación que el taller enseña a detectar
+- El afinado sube el contexto a 8192, baja la temperatura a 0.1 con seed fijo
+  —lo que hace el taller reproducible y el video de respaldo fiel a lo que ve
+  la sala— e incorpora las reglas de anclaje y la instrucción de llamar una
+  herramienta a la vez, contra la debilidad conocida de los modelos pequeños
+  encadenando llamadas dependientes
+- `bootstrap-vm.sh` lo crea; `verify-setup.sh` avisa si falta
+
+### Sin alterar
+- **No se toca el disector, la evidencia ni la detección de TRITON.** El
+  `SYSTEM` da referencia de protocolo, no respuestas: los códigos de comando son
+  los que el disector ya imprime, y para descubrir los campos le dice al modelo
+  que corra `tshark -V` en lugar de listárselos. No menciona el `keyState`, ni
+  las tramas 75 y 887, ni que el `Run program` final fue rechazado
+
 ## [0.9.0] — 2026-09-09
 
 El laboratorio pasa a correr con un modelo de lenguaje **local**.

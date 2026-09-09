@@ -111,7 +111,7 @@ Salida esperada:
 [ok] deteccion TRITON en 2 tramas
 [ok] ollama encontrado
 [ok] servicio de ollama respondiendo en localhost:11434
-[ok] modelo qwen3.5:4b disponible
+[ok] modelo afinado 'triton-analista' disponible
 
 LISTO — el taller es viable en esta maquina.
 ```

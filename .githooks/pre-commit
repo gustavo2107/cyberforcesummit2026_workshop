@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+#
+# pre-commit — bloquea el commit si detecta secretos en lo que vas a subir.
+#
+# Se instala con: ./scripts/install-hooks.sh
+#
+# Por que un hook local y no el secret scanning de GitHub: el de GitHub te
+# avisa DESPUES de que el secreto ya salio de tu maquina y ya esta en el
+# historial remoto. Este te detiene antes. Ademas, el de GitHub no esta
+# disponible en repos privados con cuenta gratuita.
+#
+set -uo pipefail
+
+rojo()  { printf '\033[0;31m%s\033[0m\n' "$*"; }
+verde() { printf '\033[0;32m%s\033[0m\n' "$*"; }
+ambar() { printf '\033[0;33m%s\033[0m\n' "$*"; }
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+FALLO=0
+
+# ---------------------------------------------------------------------------
+# 1. gitleaks, si esta disponible
+# ---------------------------------------------------------------------------
+if command -v gitleaks >/dev/null 2>&1; then
+  if ! gitleaks protect --staged --redact --no-banner \
+        --config "${REPO_ROOT}/.gitleaks.toml" 2>&1; then
+    FALLO=1
+  fi
+else
+  ambar "[aviso] gitleaks no esta instalado — corriendo solo las comprobaciones basicas."
+  ambar "        Instalalo con:  brew install gitleaks"
+fi
+
+# ---------------------------------------------------------------------------
+# 2. Comprobaciones basicas, sin dependencias
+#
+# Corren SIEMPRE, incluso con gitleaks instalado. Son baratas y cubren los
+# dos errores concretos que este repositorio puede cometer.
+# ---------------------------------------------------------------------------
+ARCHIVOS="$(git diff --cached --name-only --diff-filter=ACM)"
+[[ -z "${ARCHIVOS}" ]] && exit 0
+
+# 2a. Tokens y llaves con formato reconocible
+PATRONES='ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|xox[baprs]-[A-Za-z0-9-]{10,}'
+
+while IFS= read -r archivo; do
+  [[ -f "${archivo}" ]] || continue
+  if git diff --cached -- "${archivo}" | grep -qE "^\+.*(${PATRONES})"; then
+    rojo "[BLOQUEADO] Posible credencial en: ${archivo}"
+    FALLO=1
+  fi
+done <<< "${ARCHIVOS}"
+
+# 2b. Evidencia de terceros: nunca debe versionarse
+if echo "${ARCHIVOS}" | grep -q "evidence/tricotools/"; then
+  rojo "[BLOQUEADO] Estas intentando versionar evidencia de terceros (evidence/tricotools/)."
+  rojo "            Ese contenido es de Nozomi Networks y se descarga con"
+  rojo "            scripts/fetch-evidence.sh. Sacalo del stage:"
+  rojo "                git restore --staged evidence/tricotools/"
+  FALLO=1
+fi
+
+# 2c. Correos personales: este repositorio se mantiene anonimo.
+#
+# Chequeo generico a proposito: NO se listan aqui los correos concretos que se
+# quieren evitar, porque este archivo se publica y estaria filtrando justo lo
+# que pretende detectar. Se permiten solo direcciones noreply y de ejemplo.
+CORREOS="$(git diff --cached -- ':!*.md' \
+  | grep -E "^\+" \
+  | grep -oE "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" \
+  | grep -vE "@(users\.noreply\.github\.com|noreply\.[A-Za-z0-9.-]+|example\.(com|org|net)|localhost)" \
+  | sort -u || true)"
+
+if [[ -n "${CORREOS}" ]]; then
+  rojo "[BLOQUEADO] Correo personal en el cambio:"
+  while IFS= read -r c; do rojo "            ${c}"; done <<< "${CORREOS}"
+  rojo "            Este repositorio usa unicamente direcciones noreply."
+  FALLO=1
+fi
+
+# ---------------------------------------------------------------------------
+if [[ "${FALLO}" -ne 0 ]]; then
+  echo
+  rojo "Commit cancelado."
+  echo
+  echo "Si es un falso positivo y estas seguro, puedes saltarte el hook con:"
+  echo "    git commit --no-verify"
+  echo
+  exit 1
+fi
+
+verde "[ok] pre-commit: sin hallazgos"
+exit 0

@@ -75,7 +75,25 @@ make verify       Valida la cadena completa
 make stats        Resumen rápido de la captura
 make triton       Tramas donde el disector detecta TRITON
 make check-docs   Verifica que no falte documentación
+make hooks        Activa el hook de pre-commit (gitleaks)
 ```
+
+## Higiene del repositorio
+
+Antes de tu primer commit:
+
+```bash
+make hooks
+```
+
+Activa un hook de pre-commit que bloquea el commit si detecta un token, una
+llave privada, datos personales, o un intento de versionar la evidencia de
+terceros. Usa [gitleaks](https://github.com/gitleaks/gitleaks) si está
+instalado (`brew install gitleaks`) y, si no, corre igual unas comprobaciones
+básicas sin dependencias.
+
+Es deliberadamente local: te detiene **antes** de que el secreto salga de tu
+máquina, a diferencia del secret scanning de GitHub, que avisa después.
 
 ## Estructura
 
@@ -90,6 +108,7 @@ docs/
   05-inyeccion        ⚠️  Ejercicio de prompt injection
   06-herramientas        La cadena técnica y por qué
   07-laboratorio-vm      Provisión de la VM, paso a paso
+  08-publicacion         Checklist para pasar el repo a público
 setup/
   SETUP.md               Instalación y trampas conocidas
   mcp-config.example.json
@@ -99,6 +118,9 @@ scripts/
   bootstrap-vm.sh        Provisión completa, idempotente
   fetch-evidence.sh      Descarga desde el origen + huellas SHA-256
   verify-setup.sh        Validación previa al taller
+  install-hooks.sh       Activa el hook de pre-commit
+.githooks/
+  pre-commit             Bloquea commits con secretos o datos personales
 prompts/
   00-reglas-de-anclaje   La regla que hace que el ejercicio sirva
   01-baseline            Prompts de arranque (y los que NO usar)

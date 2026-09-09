@@ -54,11 +54,15 @@ clean:  ## Borra la evidencia descargada (se recupera con 'make evidence')
 	@rm -rf evidence/tricotools
 	@echo "evidencia eliminada — recupérala con: make evidence"
 
+.PHONY: hooks
+hooks:  ## Activa el hook de pre-commit (gitleaks)
+	@./scripts/install-hooks.sh
+
 .PHONY: check-docs
 check-docs:  ## Verifica que no falte ningún documento del taller
 	@for f in docs/00-brief-escenario.md docs/01-guia-instructor.md \
 	          docs/02-workbook.md docs/03-rubrica.md docs/04-lecturas.md \
 	          docs/05-inyeccion.md docs/06-herramientas.md \
-	          docs/07-laboratorio-vm.md; do \
+	          docs/07-laboratorio-vm.md docs/08-publicacion.md; do \
 		[[ -f "$$f" ]] && echo "  [ok] $$f" || echo "  [!!] FALTA $$f"; \
 	done

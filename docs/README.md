@@ -17,7 +17,10 @@ Si vas a impartir el taller, léelos en este orden:
 5. **[01-guia-instructor.md](01-guia-instructor.md)** ⚠️ — el guion minuto a
    minuto.
 6. **[05-inyeccion.md](05-inyeccion.md)** ⚠️ — el ejercicio final.
-7. **[00-brief-escenario.md](00-brief-escenario.md)** y
+7. **[08-publicacion.md](08-publicacion.md)** — qué hacer el día que el
+   repositorio pase a público, y por qué se publica completo. Léelo cuando
+   termine el summit.
+8. **[00-brief-escenario.md](00-brief-escenario.md)** y
    **[02-workbook.md](02-workbook.md)** — lo que van a recibir los
    participantes. Léelos al final, con ojos de participante.
 
@@ -51,4 +54,5 @@ taller pierda la mitad de su valor.
 05-inyeccion        ⚠️  El ejercicio de prompt injection.
 06-herramientas        La cadena técnica y por qué.
 07-laboratorio-vm      Provisión de la VM, paso a paso.
+08-publicacion         Checklist para pasar el repo a público.
 ```

@@ -2,6 +2,27 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.4.0] — 2026-09-09
+
+Higiene del repositorio y preparación para publicación.
+
+### Agregado
+- `.githooks/pre-commit` — bloquea commits que contengan tokens, llaves
+  privadas, datos personales, o intentos de versionar la evidencia de terceros.
+  Usa gitleaks si está disponible y, si no, corre comprobaciones básicas sin
+  dependencias
+- `.gitleaks.toml` — configuración extendida sobre las reglas por defecto
+- `scripts/install-hooks.sh` y objetivo `make hooks`
+- `docs/08-publicacion.md` — checklist para pasar el repositorio a público, con
+  el registro de por qué se publica completo (incluida la rúbrica)
+
+### Razonamiento registrado
+- El repositorio se publicará completo: quien vaya a replicar el taller
+  necesita la rúbrica y la guía del instructor. El riesgo de que los
+  participantes lleguen a las respuestas se resuelve por temporalidad —el
+  repositorio permanece privado hasta que termine la sesión— y no por
+  ocultamiento
+
 ## [0.3.0] — 2026-09-09
 
 Anonimización y etiquetado explícito de datos sintéticos, previo a publicación.

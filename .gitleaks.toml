@@ -1,0 +1,38 @@
+# Configuración de gitleaks para el repositorio del taller.
+#
+# Se extiende la configuración por defecto de gitleaks, que ya detecta las
+# familias que nos importan: tokens de GitHub (ghp_, github_pat_), llaves de
+# AWS, llaves privadas SSH/PGP, y credenciales genéricas en asignaciones.
+#
+# El riesgo concreto de este repositorio es setup/mcp-config.example.json:
+# es el archivo que se edita al fijar el MCP, y donde es fácil dejar un token
+# real en lugar del marcador de posición.
+
+title = "Taller CyberForce Summit 2026"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "token-github-explicito"
+description = "Token de GitHub (classic o fine-grained)"
+regex = '''(ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,})'''
+tags = ["github", "token"]
+
+[[rules]]
+id = "correo-personal-en-config"
+description = "Correo personal en archivos de configuracion (usar noreply)"
+regex = '''[A-Za-z0-9._%+-]+@(?!users\.noreply\.github\.com|example\.(com|org)|localhost)[A-Za-z0-9.-]+\.[A-Za-z]{2,}'''
+path = '''(setup/|scripts/|\.gitleaks\.toml)'''
+tags = ["privacidad"]
+
+[allowlist]
+description = "Excepciones legitimas del taller"
+paths = [
+  # Documentacion: contiene URLs y correos de autores de las fuentes citadas
+  '''docs/.*\.md''',
+  '''NOTICE\.md''',
+  '''README\.md''',
+  # Datos sinteticos: ficticios por diseno, declarados como tales
+  '''evidence/datos-sinteticos/.*''',
+]

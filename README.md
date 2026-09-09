@@ -78,23 +78,6 @@ make check-docs   Verifica que no falte documentación
 make hooks        Activa el hook de pre-commit (gitleaks)
 ```
 
-## Higiene del repositorio
-
-Antes de tu primer commit:
-
-```bash
-make hooks
-```
-
-Activa un hook de pre-commit que bloquea el commit si detecta un token, una
-llave privada, datos personales, o un intento de versionar la evidencia de
-terceros. Usa [gitleaks](https://github.com/gitleaks/gitleaks) si está
-instalado (`brew install gitleaks`) y, si no, corre igual unas comprobaciones
-básicas sin dependencias.
-
-Es deliberadamente local: te detiene **antes** de que el secreto salga de tu
-máquina, a diferencia del secret scanning de GitHub, que avisa después.
-
 ## Estructura
 
 ```

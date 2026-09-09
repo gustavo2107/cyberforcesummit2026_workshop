@@ -72,6 +72,30 @@ root**. Ver `setup/SETUP.md`, trampa 1.
 | Wireshark gráfico | Preparar capturas de pantalla y el video de respaldo. |
 | [`MDudek-ICS/TRISIS-TRITON-HATMAN`](https://github.com/MDudek-ICS/TRISIS-TRITON-HATMAN) | Binarios originales y decompilados. **Material de preparación del instructor. No se distribuye ni se ejecuta en el venue.** |
 
+### Hook de pre-commit
+
+El repositorio trae un hook que bloquea commits con tokens, llaves privadas,
+correos personales o intentos de versionar la evidencia de terceros. **No se
+activa solo:** `core.hooksPath` es configuración local y no viaja en el
+repositorio, así que después de clonar hay que correrlo una vez.
+
+```bash
+make hooks          # activa .githooks/
+brew install gitleaks   # opcional, para cobertura completa
+```
+
+Sin gitleaks el hook corre igual unas comprobaciones básicas sin dependencias.
+Con gitleaks añade el catálogo completo de reglas del proyecto.
+
+Es deliberadamente local: te detiene **antes** de que el secreto salga de tu
+máquina, a diferencia del secret scanning de GitHub, que avisa después — y que
+además no está disponible en repositorios privados con cuenta gratuita.
+
+> Si agregas reglas a `.gitleaks.toml`, recuerda que gitleaks usa RE2 y **no
+> soporta lookahead ni lookbehind**. Una regla con `(?!...)` no falla la
+> validación: hace que gitleaks entre en pánico y el hook reviente en cada
+> commit. Pruébala con `gitleaks detect --config .gitleaks.toml --no-git`.
+
 ---
 
 ## Lo que este taller deliberadamente NO usa

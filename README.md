@@ -210,8 +210,8 @@ público, sin modificar. Ver [`evidence/datos-sinteticos/README.md`](evidence/da
 ## Integridad de la evidencia
 
 El PCAP es evidencia auténtica de un tercero y **no se modifica**. El ejercicio
-de inyección usa artefactos en `evidence/datos-sinteticos/` que son **sintéticos y de
-nuestra autoría**, declarados como tales en su propio README.
+de inyección usa artefactos en `evidence/datos-sinteticos/` que son **sintéticos y
+fueron creados para este taller**, declarados como tales en su propio README.
 
 Adulterar la evidencia real invalidaría la comparación contra los reportes
 públicos, que es el eje del taller.

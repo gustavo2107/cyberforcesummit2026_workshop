@@ -107,7 +107,7 @@ que todo lo aprendido se pueda aplicar con herramientas libres.
 **Frameworks de emulación de adversarios (Atomic Red Team, Caldera).** Generan
 telemetría sintética cuya respuesta ya conoces. Aquí el punto es exactamente el
 contrario: evidencia real, con una verdad de referencia publicada por terceros
-e independiente de nosotros.
+e independiente de este taller.
 
 **Extracción automatizada de IOCs.** En esta captura no hay IOCs
 operativamente útiles, y pedirlos es invitar al modelo a inventarlos. Ver

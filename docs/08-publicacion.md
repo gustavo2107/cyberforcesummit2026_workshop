@@ -38,9 +38,10 @@ y el historial de commits los delata en un minuto.
 
 - [ ] **La sesión del summit ya ocurrió.** Es la condición que habilita todo lo
       demás. No publicar antes.
-- [ ] Corregir el typo de la descripción del repositorio si sigue ahí — dice
-      "reaplicar", va "replicar". Se edita en la página principal del repo →
-      columna derecha → **About** → ⚙️.
+- [ ] Revisar la descripción del repositorio: que diga qué es y para quién, y
+      que no tenga erratas. Es lo primero que lee alguien que llega desde una
+      búsqueda. Se edita en la página principal del repositorio → columna
+      derecha → **About** → ⚙️.
 - [ ] Verificar que no haya datos personales:
 
       # Autores del historial: solo debe aparecer la identidad noreply
@@ -64,7 +65,8 @@ y el historial de commits los delata en un minuto.
       git tag -a v1.0-summit -m "Versión impartida en CyberForce Summit 2026"
       git push origin v1.0-summit
 
-      Así, si después le mueves, queda claro qué se usó realmente ese día.
+      Así, si el material cambia después, queda constancia de qué versión se
+      impartió ese día.
 
 ---
 

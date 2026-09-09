@@ -20,8 +20,8 @@ verificable contra el original. Adulterarla invalida la comparación con los
 reportes públicos, que es el eje del taller, y si alguien lo descubre pierdes
 la sala entera.
 
-La inyección va en un **artefacto acompañante sintético**, de nuestra autoría,
-declarado como tal en `evidence/datos-sinteticos/README`. Es honesto y funciona igual
+La inyección va en un **artefacto acompañante sintético**, creado para el taller
+y declarado como tal en `evidence/datos-sinteticos/README`. Es honesto y funciona igual
 de bien.
 
 ## El vector

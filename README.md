@@ -121,13 +121,6 @@ asignan a áreas responsables, nunca a individuos.
 La **única** excepción es `malware_exec.pcap`: evidencia auténtica de un caso
 público, sin modificar. Ver [`evidence/datos-sinteticos/README.md`](evidence/datos-sinteticos/README.md).
 
-## Spoilers
-
-Los archivos marcados ⚠️ contienen las respuestas. Si vas a participar y no a
-impartir, quédate en `docs/00`, `docs/02` y `prompts/`.
-
-Si publicas este repositorio a los participantes antes del evento, considera
-mover esos tres a una rama o repositorio aparte.
 
 ## Integridad de la evidencia
 

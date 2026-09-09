@@ -10,12 +10,17 @@ queda como alternativa para quien ya tenga ese flujo montado.
 
 ## 1. Especificación de la VM
 
-| Recurso | Mínimo | Recomendado |
-|---|---|---|
-| vCPU | 2 | 2 |
-| RAM | 2 GB | 4 GB |
-| Disco | 15 GB | 20 GB |
-| Red | NAT con salida a internet | igual |
+| Recurso | Mínimo | Recomendado | Por qué |
+|---|---|---|---|
+| vCPU | 4 | 8 | La inferencia en CPU escala con núcleos |
+| RAM | 8 GB | 16 GB | El modelo ocupa ~4 GB residentes |
+| Disco | 30 GB | 40 GB | Pesos del modelo, Ollama, sistema y evidencia |
+| Red | NAT con salida a internet | igual | Sólo durante la preparación |
+
+> **Estas cifras subieron respecto a versiones anteriores de esta guía.** El
+> laboratorio corre ahora un modelo de lenguaje local, y eso cambia el piso: con
+> 2 GB de RAM no arranca. Si vas a distribuir la VM, confirma que las laptops de
+> tus participantes tengan holgura para asignarle 8 GB.
 
 **Sistema operativo:** Ubuntu Server 24.04 LTS. Es la referencia con la que se
 validó este repositorio (tshark 4.2.2, Lua 5.2.4). Debian 12 funciona igual.
@@ -162,29 +167,100 @@ que el disector esté cargado.
 
 ---
 
-## 7. El MCP de tshark
+## 7. El modelo local
 
-Elige uno y **fíjalo con semanas de antelación**. No cambies de MCP la semana
-del evento.
+El laboratorio corre **todo el análisis en la propia VM**. No hay llamadas a
+ningún proveedor externo, no hacen falta cuentas ni tokens, y la evidencia nunca
+sale de la máquina — que para un taller de forense OT no es un detalle menor.
+
+> ⚠️ **Esta sección no está verificada de punta a punta**, a diferencia del
+> resto de la guía. La cadena `tshark` + disector sí se corrió y se comprobó; la
+> combinación Ollama + modelo + cliente MCP está documentada desde las fuentes
+> del punto 7.4, pero **tienes que validarla tú en tu VM antes del taller.**
+
+### 7.1 Ollama
 
 ```bash
-# ejemplo con un MCP distribuido por npm
+curl -fsSL https://ollama.com/install.sh | sh
+ollama --version
+```
+
+Ollama es el runtime: descarga los pesos, los sirve por una API local y gestiona
+la memoria. Corre como servicio y escucha en `localhost:11434`.
+
+### 7.2 El modelo
+
+```bash
+ollama pull qwen3.5:4b
+```
+
+**Por qué éste y no uno más grande.** En la evaluación de tool calling de 2026
+citada en `06-herramientas.md`, Qwen3.5 4B obtuvo **97.5% de acierto** sobre 40
+casos deterministas — el primer lugar, por encima de modelos cinco veces
+mayores. Pesa 3.4 GB.
+
+Eso importa porque el laboratorio no le pide al modelo que escriba bonito: le
+pide que **invoque `tshark`, lea el resultado y no invente entre una llamada y
+otra**. Ahí es donde los modelos locales se separan, y donde muchos grandes
+fallan más que este pequeño.
+
+En CPU pura, un modelo de 4B responde en segundos, no al instante. Adviértelo a
+la sala: la espera es normal y no es que se haya trabado.
+
+### 7.3 El cliente MCP
+
+```bash
+pip install --user --upgrade ollmcp
+```
+
+`ollmcp` es el puente: conecta el modelo de Ollama con los servidores MCP por
+stdio, maneja el ciclo de llamada a herramientas y tiene modo agente y
+confirmación humana. Requiere Python 3.11 o superior.
+
+### 7.4 El servidor MCP de tshark
+
+Elige uno de los de `06-herramientas.md` y **fíjalo con semanas de antelación.**
+No cambies de servidor MCP la semana del evento.
+
+```bash
+# ejemplo, si el que elegiste se distribuye por npm
 npm install -g <paquete-del-mcp-elegido>
 ```
 
-Configura tu cliente de IA con `setup/mcp-config.example.json` como base,
-ajustando rutas absolutas.
+El criterio de elección no cambia: que invoque el `tshark` del sistema en lugar
+de traer su propio parser, para que herede el disector sin escribir código.
+Configúralo tomando `setup/mcp-config.example.json` como base, con rutas
+absolutas.
 
-**La verificación que importa** — pídele al asistente, antes del taller:
+### 7.5 La validación
 
-> Corre `tshark -r malware_exec.pcap -c 1` y dime qué protocolo reporta.
+Con todo arriba, arranca el cliente apuntando al servidor MCP y hazle la
+pregunta de control:
 
-Debe responder **TRISTATION**. Si responde `UDP`, el proceso del MCP está
-corriendo como root o con otro usuario que no tiene el disector instalado. Si
-no lo detectas aquí, lo vas a detectar en el salón cuando el asistente empiece
-a inventar para llenar el hueco.
+```
+Corre: tshark -r malware_exec.pcap -c 1
+y dime qué protocolo reporta.
+```
 
----
+**Debe responder `TRISTATION`, y debes ver la llamada a la herramienta en
+pantalla.**
+
+Dos formas de fallar, y conviene distinguirlas:
+
+- **Responde `UDP`** — el disector no cargó. El proceso corre como root o con un
+  usuario sin el plugin. Ver la trampa 1 de `setup/SETUP.md`.
+- **Responde algo plausible sin llamar la herramienta** — el modelo está
+  inventando. Es el fallo que el taller entero enseña a detectar, y si lo hace
+  en la validación lo va a hacer toda la sesión. Cambia de modelo antes de
+  seguir.
+
+### 7.6 Si el modelo local no da el ancho
+
+No lo fuerces. La ruta con un proveedor en la nube sigue siendo válida y está
+documentada en `06-herramientas.md`. Perderías la independencia de la red del
+venue, pero ganarías capacidad — y el taller funciona con ambas.
+
+Decídelo en tu ensayo, no en el salón.
 
 ## 8. Snapshot — no te la saltes
 
@@ -222,14 +298,16 @@ descarga simultánea sobre el WiFi del venue.
 ## 10. Lista de verificación previa
 
 - [ ] VM construida y verificación en verde
+- [ ] **Modelo local descargado y respondiendo** (`ollama list`)
+- [ ] **La pregunta de control devuelve TRISTATION, con llamada visible a la herramienta**
 - [ ] Snapshot `baseline-verificada` tomada
-- [ ] Probada en una máquina **que no sea la tuya**
+- [ ] Probada en una máquina **que no sea la tuya**, con 8 GB asignados
 - [ ] Huellas SHA-256 comunicadas a los participantes
-- [ ] MCP fijado y validado con la pregunta del paso 7
 - [ ] OVA exportada y copiada a dos USB
 - [ ] Video de respaldo del flujo completo grabado
 - [ ] Dos mesas de rescate con el entorno ya corriendo
 
-El video de respaldo no es opcional. Si se cae el WiFi o el proveedor de IA
-tiene un mal día, el taller se convierte en demo guiada y sigue funcionando.
-Sin el video, se acaba.
+Con el modelo corriendo en local, el laboratorio ya no depende de la red del
+venue. Eso elimina la falla más común, pero **no elimina la necesidad del video
+de respaldo**: un modelo pequeño puede portarse mal en vivo, y el video te deja
+seguir dando el taller como demo guiada.

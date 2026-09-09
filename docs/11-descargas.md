@@ -31,8 +31,9 @@ la guía para quien prefiera su propio entorno.
 | 2 | Paquetes del sistema (apt) | ~40–60 MB | Sí | Al provisionar |
 | 3 | Este repositorio | < 1 MB | Sí | Al provisionar |
 | 4 | Evidencia y disector (tricotools) | **484 KB** | Sí | Al provisionar |
-| 5 | El MCP elegido | 5–50 MB | Sí | Al provisionar |
-| 6 | Cliente de IA | variable | Sí | Antes del evento |
+| 5 | **Ollama** (runtime del modelo) | ~1.5 GB | Sí | Al provisionar |
+| 6 | **Pesos del modelo `qwen3.5:4b`** | **3.4 GB** | Sí | Al provisionar |
+| 6b | `ollmcp` (cliente MCP) + el servidor MCP | 5–50 MB | Sí | Al provisionar |
 | 7 | gitleaks | **7.8 MB** | No | Sólo quien commitea |
 | 8 | `crcmod` (pip) | < 1 MB | No | Sólo para el honeypot |
 | 9 | Docker | ~100 MB | No | Sólo ruta alternativa |
@@ -152,14 +153,39 @@ distribuidos por npm arrastran `nodejs` y `npm`, que suman al peso.
 
 ---
 
-## 6. Cliente de IA
+## 6. Ollama y el modelo local
 
-El que vayas a usar en el taller. **Verifica dos cosas antes del evento:**
+**Ollama** — <https://ollama.com>
 
-- Que la cuenta esté activa y con cupo suficiente para toda la sala
-- Que el venue no bloquee el dominio del proveedor
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
 
-Ambas cosas se descubren tarde y ninguna se arregla en el momento.
+**El modelo** — 3.4 GB, la descarga más pesada de la lista después del ISO:
+
+```bash
+ollama pull qwen3.5:4b
+```
+
+Los pesos quedan en `~/.ollama/models`. Se pueden copiar entre máquinas: si vas
+a montar varias VMs, descárgalos una vez y copia esa carpeta en lugar de bajar
+3.4 GB por equipo.
+
+```bash
+ollama list      # confirma que quedó
+du -sh ~/.ollama/models
+```
+
+**El cliente MCP:**
+
+```bash
+pip install --user --upgrade ollmcp
+```
+
+> **Ventaja operativa:** una vez descargado, el laboratorio **no necesita
+> internet en absoluto.** Ni cuentas, ni tokens, ni que el venue deje pasar el
+> dominio de un proveedor. Es la diferencia entre un taller que depende del WiFi
+> y uno que no.
 
 ---
 
@@ -226,7 +252,10 @@ Lo que conviene llevar en USB el día del evento:
 
 Dos memorias, no una. Circulan en paralelo y una se puede corromper.
 
-**Lo que no cabe en la USB es la conexión al proveedor de IA.** Ése es el único
-punto que sigue dependiendo de la red del venue, y es exactamente para lo que
-existen el video de respaldo y el plan B de
-[`10-ejecucion.md`](10-ejecucion.md).
+**Con el modelo en local, ya no queda nada que dependa de la red del venue.**
+Ésa era la única pieza que no cabía en una USB, y ya cabe: son 3.4 GB de pesos
+dentro de la OVA.
+
+Lo que sigue justificando el video de respaldo y el plan B de
+[`10-ejecucion.md`](10-ejecucion.md) no es la red, sino el modelo: uno pequeño
+puede portarse mal en vivo, y conviene tener con qué seguir.

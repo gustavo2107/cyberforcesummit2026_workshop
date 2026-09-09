@@ -44,6 +44,7 @@ sesión vas a estar señalando rutas en voz alta.
 | Raíz de trabajo | `~/taller` — todos los comandos salen de aquí |
 | La evidencia | `evidence/tricotools/malware_exec.pcap` |
 | El disector | `~/.local/lib/wireshark/plugins/TriStation.lua` |
+| El modelo | Ollama, en `localhost:11434` — `ollama list` para verlo |
 | Lo que se reparte | `docs/00-brief-escenario.md`, `docs/02-workbook.md`, `prompts/` |
 | Lo que **no** se reparte todavía | `docs/03-rubrica.md` |
 
@@ -55,29 +56,56 @@ export PCAP=~/taller/evidence/tricotools/malware_exec.pcap
 
 ---
 
-## 3. Levantar el MCP y validarlo
+## 3. Levantar el modelo y el cliente
 
-El MCP es el puente entre el asistente de IA y `tshark`. Cómo se arranca depende
-del que hayas elegido — ver [`06-herramientas.md`](06-herramientas.md) — pero la
-validación es siempre la misma, y **no es opcional**.
+Todo el análisis corre en la propia VM. No hay llamadas a ningún proveedor
+externo y la evidencia nunca sale de la máquina.
 
-Con el MCP configurado, pídele al asistente esto, antes de que llegue nadie:
+### 3.1 Confirmar que el modelo está arriba
+
+```bash
+ollama list          # debe aparecer qwen3.5:4b
+ollama ps            # muestra si ya está cargado en memoria
+```
+
+Si no está cargado, la primera respuesta de la sesión va a tardar más mientras
+se carga. Conviene "calentarlo" antes de que llegue la gente:
+
+```bash
+ollama run qwen3.5:4b "responde solo: listo" --verbose
+```
+
+### 3.2 Arrancar el cliente MCP
+
+```bash
+cd ~/taller
+ollmcp --model qwen3.5:4b --mcp-server <config-del-servidor-tshark>
+```
+
+Los parámetros exactos dependen del servidor MCP que hayas fijado. Toma
+`setup/mcp-config.example.json` como base y usa rutas absolutas.
+
+### 3.3 La pregunta de control
+
+**Antes de que llegue nadie**, y el mismo día — no la semana anterior:
 
 ```
 Corre: tshark -r malware_exec.pcap -c 1
 y dime qué protocolo reporta.
 ```
 
-**Debe responder `TRISTATION`.**
+**Debe responder `TRISTATION`, y debes ver la llamada a la herramienta en
+pantalla.**
 
-Si responde `UDP`, el proceso del MCP está corriendo como root o con un usuario
-que no tiene el disector instalado. No sigas: el asistente estaría viendo
-tráfico opaco, y como no sabe decir "no sé", va a rellenar con lo que recuerda de
-su entrenamiento. Un reporte fluido, seguro y falso — que es exactamente el
-fracaso que el taller enseña a evitar.
+Hay dos formas de fallar y conviene distinguirlas, porque se arreglan distinto:
 
-Haz esta comprobación **el mismo día**, no la semana anterior. Un MCP que
-funcionaba el martes puede estar arrancando con otro usuario el jueves.
+| Qué ves | Qué pasa | Qué hacer |
+|---|---|---|
+| Responde `UDP` | El disector no cargó: el proceso corre como root o sin el plugin | Trampa 1 de `setup/SETUP.md` |
+| Responde algo plausible **sin llamar la herramienta** | El modelo está inventando | Cambiar de modelo. No sigas. |
+
+El segundo caso es el grave: es exactamente el fallo que el taller enseña a
+detectar, y si el modelo lo hace en la validación lo va a hacer toda la sesión.
 
 ---
 
@@ -149,9 +177,12 @@ dilo al principio de la sesión, o nadie la va a entregar con honestidad.
 
 ## 5. Plan B — el laboratorio sin IA
 
-**Todo el workbook se puede completar con `tshark` a secas.** Si se cae el WiFi
-del venue, si el proveedor de IA tiene un mal día, o si el MCP falla a media
-sesión, el taller no se acaba: cambia de forma.
+**Todo el workbook se puede completar con `tshark` a secas.** Con el modelo en
+local ya no dependes de la red del venue, pero siguen existiendo formas de
+quedarte sin asistente: que el modelo se atore, que consuma toda la RAM de una
+laptop apretada, o que empiece a inventar de forma evidente a media sesión.
+
+Si eso pasa, el taller no se acaba: cambia de forma.
 
 Lo pierdes es la mitad de la lección sobre alucinación. Conservas toda la parte
 forense, que es la mitad que se aplica el lunes.

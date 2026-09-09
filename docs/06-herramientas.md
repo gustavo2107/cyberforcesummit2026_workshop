@@ -10,9 +10,35 @@ Qué usa el taller, para qué sirve cada pieza y por qué está elegida así.
 |---|---|---|
 | `tshark` | 4.2.2 (Lua 5.2.4) | Motor de análisis. Todo lo que se afirma en el taller sale de un comando suyo. |
 | `TriStation.lua` | 2018-04-04 | Disector del protocolo. Convierte 896 tramas opacas en una historia legible. |
-| MCP de tshark | variable | Puente entre el asistente de IA y `tshark`. |
+| **Ollama** | — | Runtime del modelo local. Sirve los pesos por API en `localhost:11434`. |
+| **Qwen3.5 4B** | 3.4 GB | El analista. Elegido por su desempeño llamando herramientas, no por su prosa. |
+| **`ollmcp`** | — | Cliente MCP para Ollama. Conecta el modelo con los servidores por stdio. |
+| MCP de tshark | variable | Puente entre el cliente y `tshark`. |
 | `capinfos` | viene con tshark | Metadatos de la captura (bloque 1 del workbook). |
 | `git` | cualquiera reciente | Obtener el repo y la evidencia. |
+
+### Por qué un modelo local, y por qué éste
+
+**Local** porque elimina de golpe las tres fallas más comunes de un taller con
+IA: que el WiFi del venue no aguante, que el proveedor tenga un mal día, y que
+los participantes no traigan cuenta. Además la evidencia nunca sale de la
+máquina, que en un taller de forense OT no es un detalle menor.
+
+**Qwen3.5 4B** porque el laboratorio no le pide al modelo que escriba bien: le
+pide que **invoque `tshark`, lea el resultado y no invente entre una llamada y
+otra**. En la evaluación de tool calling de 2026 sobre 40 casos deterministas,
+este modelo de 3.4 GB obtuvo **97.5% de acierto** — primer lugar, por encima de
+modelos cinco veces mayores. Ahí es donde los locales se separan.
+
+En CPU pura responde en segundos, no al instante. Es esperable y hay que
+advertirlo a la sala.
+
+> **Un efecto secundario que conviene conocer:** un modelo de 4B sabe bastante
+> menos de TRITON que uno de frontera. Eso hace el análisis a ciegas más limpio
+> —hay menos que recitar— pero debilita el experimento de contaminación de
+> `../prompts/02-experimento-contaminacion.md`, que se apoya justamente en que
+> el modelo conozca el caso. Si quieres esa demostración en toda su fuerza,
+> córrela aparte contra un modelo grande.
 
 ### Por qué `tshark` y no Wireshark gráfico
 

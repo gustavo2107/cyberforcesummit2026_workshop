@@ -2,6 +2,37 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.9.0] — 2026-09-09
+
+El laboratorio pasa a correr con un modelo de lenguaje **local**.
+
+### Cambiado
+- **Todo el análisis corre ahora en la propia VM.** Sin cuentas, sin tokens y
+  sin depender de la red del venue durante el taller. La evidencia nunca sale de
+  la máquina, que en un taller de forense OT importa
+- **Specs de la VM revisadas:** de 2 vCPU / 2 GB a **4 vCPU / 8 GB mínimo**
+  (16 GB recomendado) y 30 GB de disco. Con 2 GB el modelo no arranca
+- `scripts/bootstrap-vm.sh` instala Ollama, descarga los pesos e instala el
+  cliente MCP. Se omite con `SIN_MODELO=1` para quien prefiera la nube
+- `scripts/verify-setup.sh` reporta el estado del modelo sin hacer fallar la
+  verificación, porque la ruta con proveedor en la nube sigue siendo válida
+- `docs/07`, `docs/10` y `docs/11` reescritos en consecuencia
+
+### Decisión registrada
+- Runtime **Ollama**, modelo de referencia **Qwen3.5 4B**, cliente **`ollmcp`**
+- El modelo se eligió por su desempeño llamando herramientas, no por su prosa:
+  97.5% de acierto sobre 40 casos deterministas de tool calling, primer lugar
+  por encima de modelos cinco veces mayores, en 3.4 GB
+- Efecto secundario documentado: un modelo de 4B sabe menos de TRITON que uno de
+  frontera. Eso limpia el análisis a ciegas y debilita el experimento de
+  contaminación, que conviene correr aparte contra un modelo grande
+
+### Sin verificar
+- **La cadena Ollama + modelo + cliente MCP no está verificada de punta a
+  punta**, a diferencia del resto del repositorio. Está documentada desde
+  fuentes y marcada como tal en `docs/07-laboratorio-vm.md`. Hay que validarla
+  en la VM antes del taller
+
 ## [0.8.0] — 2026-09-09
 
 ### Agregado

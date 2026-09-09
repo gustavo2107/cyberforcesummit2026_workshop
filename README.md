@@ -7,7 +7,8 @@
 | **Duración** | 2 horas |
 | **Formato** | Hands-on, equipos de 2–3 personas |
 | **Nivel** | Intermedio |
-| **Requisitos** | VM Linux con `tshark`, un asistente de IA con MCP |
+| **Requisitos** | VM Linux, 8 GB de RAM, 30 GB de disco — todo corre en local |
+| **Modelo** | Local, sin cuentas ni conexión a internet durante el taller |
 | **Evidencia** | Captura real de TRITON/TRISIS (Nozomi Networks, BSD-3-Clause) |
 
 ---
@@ -85,14 +86,22 @@ Todo el diseño del taller vive en esa bifurcación.
 
 ## Inicio rápido
 
-En una VM Ubuntu 24.04 limpia, **como usuario sin privilegios**:
+En una VM Ubuntu 24.04 limpia con **8 GB de RAM**, y **como usuario sin
+privilegios**:
 
 ```bash
 git clone <url-de-este-repo> taller && cd taller
 make bootstrap
 ```
 
-Eso instala todo, descarga la evidencia y verifica la cadena. Salida esperada:
+Eso instala tshark y el disector, descarga la evidencia, instala el modelo local
+y verifica la cadena. **Descarga unos 5 GB** — la mayor parte son los pesos del
+modelo, así que hazlo con red decente y no en el venue.
+
+Si vas a usar un proveedor en la nube en lugar del modelo local:
+`SIN_MODELO=1 make bootstrap`.
+
+Salida esperada:
 
 ```
 [ok] tshark encontrado (TShark (Wireshark) 4.2.2)
@@ -100,6 +109,9 @@ Eso instala todo, descarga la evidencia y verifica la cadena. Salida esperada:
 [ok] disector TriStation cargado
 [ok] protocolo detectado: TRISTATION
 [ok] deteccion TRITON en 2 tramas
+[ok] ollama encontrado
+[ok] servicio de ollama respondiendo en localhost:11434
+[ok] modelo qwen3.5:4b disponible
 
 LISTO — el taller es viable en esta maquina.
 ```

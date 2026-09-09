@@ -58,6 +58,26 @@ else
   bad "deteccion TRITON en ${HITS} tramas — se esperaban 2"
 fi
 
+# 6. modelo local (informativo: el taller admite tambien un proveedor en la nube)
+MODELO="${MODELO:-qwen3.5:4b}"
+echo
+if command -v ollama >/dev/null 2>&1; then
+  ok "ollama encontrado"
+  if curl -sf http://localhost:11434/api/tags >/dev/null 2>&1; then
+    ok "servicio de ollama respondiendo en localhost:11434"
+    if ollama list 2>/dev/null | grep -q "^${MODELO%%:*}"; then
+      ok "modelo ${MODELO} disponible"
+    else
+      echo "[--] modelo ${MODELO} no descargado — ollama pull ${MODELO}"
+    fi
+  else
+    echo "[--] ollama instalado pero el servicio no responde"
+  fi
+else
+  echo "[--] ollama no encontrado (normal si vas a usar un proveedor en la nube)"
+fi
+echo "     La cadena modelo + MCP se valida a mano: ver docs/10-ejecucion.md, paso 3.3"
+
 echo
 if [[ "${FAIL}" -eq 0 ]]; then
   echo "LISTO — el taller es viable en esta maquina."

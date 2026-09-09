@@ -1,0 +1,31 @@
+{
+  "_comentario": [
+    "Ejemplo de configuracion de un MCP de tshark para el taller.",
+    "Ajusta 'command' y 'args' segun el MCP que hayas elegido:",
+    "  0xKoda/WireMCP  ·  bx33661/Wireshark-MCP",
+    "  khuynh22/mcp-wireshark  ·  tuliperis/SharkMCP",
+    "",
+    "CRITICO: el proceso NO debe correr como root. tshark deshabilita los",
+    "scripts Lua para superusuario y el disector TriStation no cargara.",
+    "El sintoma es que el asistente vera 'UDP' y payload 'data' en lugar",
+    "de TRISTATION, y va a inventar para llenar el hueco."
+  ],
+
+  "mcpServers": {
+    "tshark": {
+      "command": "npx",
+      "args": ["-y", "<paquete-del-mcp-elegido>"],
+      "env": {
+        "PCAP_DIR": "/ruta/absoluta/al/repo/evidence/tricotools",
+        "WIRESHARK_PLUGIN_DIR": "/home/<usuario>/.local/lib/wireshark/plugins"
+      }
+    }
+  },
+
+  "_verificacion": [
+    "Antes del taller, pidele al asistente:",
+    "  'Corre: tshark -r malware_exec.pcap -c 1 y dime el protocolo'",
+    "Debe responder TRISTATION. Si responde UDP, el disector no cargo",
+    "y el taller no funciona: revisa setup/SETUP.md."
+  ]
+}

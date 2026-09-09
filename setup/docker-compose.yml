@@ -1,0 +1,13 @@
+services:
+  analista:
+    build:
+      context: ..
+      dockerfile: setup/Dockerfile
+    container_name: taller-triton
+    # Sin privilegios: tshark deshabilita Lua para superusuario.
+    user: analyst
+    working_dir: /home/analyst
+    volumes:
+      - ../evidence:/home/analyst/evidence:ro
+      - ../docs:/home/analyst/docs:ro
+    command: sleep infinity

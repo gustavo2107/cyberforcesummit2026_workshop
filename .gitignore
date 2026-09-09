@@ -1,0 +1,11 @@
+# Evidencia de terceros: se obtiene con scripts/fetch-evidence.sh
+evidence/tricotools/
+
+# Trabajo de participantes
+entregas/
+*.local.md
+
+# Sistema
+.DS_Store
+__pycache__/
+*.pyc

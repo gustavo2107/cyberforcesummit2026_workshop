@@ -6,7 +6,7 @@
 PCAP y el disector publicados por Nozomi Networks. **No se versiona en este
 repositorio** (ver `.gitignore`).
 
-`companion/` — artefactos sintéticos de nuestra autoría para el ejercicio del
+`datos-sinteticos/` — artefactos sintéticos de nuestra autoría para el ejercicio del
 Bloque 6. Estos sí se versionan, y están declarados como sintéticos en su
 propio README.
 

@@ -1,15 +1,21 @@
 # Brief del escenario
 
 > Documento para participantes. No contiene la respuesta.
+>
+> **El escenario, la empresa y todos los datos de contexto son ficticios y
+> fueron generados para este laboratorio.** La única excepción es la captura de
+> red, que es evidencia auténtica de un caso público. Ver
+> `evidence/datos-sinteticos/README.md`.
 
 ---
 
 ## Situación
 
-Trabajas en el equipo de respuesta a incidentes de una consultora. Un cliente
-industrial te contrata tras una serie de eventos que no logra explicar: paros
-de proceso no programados y discrepancias entre lo que el personal de planta
-observa en campo y lo que reportan las consolas.
+Trabajas en el equipo de respuesta a incidentes de una consultora. Tu cliente
+es **Industrias ACME de México, S.A. de C.V.** — empresa ficticia — que te
+contrata para su **Planta ACME-1** tras una serie de eventos que no logra
+explicar: paros de proceso no programados y discrepancias entre lo que el
+personal de planta observa en campo y lo que reportan las consolas.
 
 El área de TI del cliente no encuentra nada. El área de operaciones insiste en
 que "algo está mal con los sistemas de seguridad".

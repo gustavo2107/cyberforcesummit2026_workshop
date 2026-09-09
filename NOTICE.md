@@ -32,8 +32,26 @@ Enlaces completos en `docs/04-lecturas.md`.
 ## Materiales de este repositorio
 
 El brief, el workbook, la rúbrica, la guía del instructor, los prompts, los
-scripts y los artefactos sintéticos de `evidence/companion/` son obra propia,
+scripts y los artefactos sintéticos de `evidence/datos-sinteticos/` son obra propia,
 bajo la licencia en `LICENSE`.
+
+## Datos sintéticos
+
+Todo el contexto del escenario fue **generado para este laboratorio** y es
+ficticio: la empresa cliente (*Industrias ACME de México, S.A. de C.V.*), la
+planta, los números de ticket, las direcciones IP del escenario y las fechas.
+
+Convenciones aplicadas:
+
+- Direcciones IP en rango privado RFC 1918, sin correspondencia con red real
+  alguna.
+- **Sin nombres de personas.** Las tareas y tickets se asignan a áreas
+  responsables (Instrumentación, Automatización, Redes, Ingeniería), nunca a
+  individuos.
+- Nomenclatura de equipos genérica.
+- "ACME" como marcador de entidad ficticia.
+
+Detalle en `evidence/datos-sinteticos/README.md`.
 
 ## Lo que este repositorio NO contiene
 
@@ -41,8 +59,9 @@ bajo la licencia en `LICENSE`.
   repositorio `MDudek-ICS/TRISIS-TRITON-HATMAN` contiene los binarios
   originales y decompilados; es material de preparación del instructor, **no
   se distribuye en el taller ni se ejecuta en el venue**.
-- **Datos de ninguna víctima real.** El escenario del brief es ficticio y los
-  artefactos acompañantes son sintéticos.
+- **Datos de ninguna víctima real.**
+- **Datos personales de nadie.** Ni en los artefactos, ni en la documentación,
+  ni en los metadatos de los commits.
 
 ## Nota sobre la víctima
 

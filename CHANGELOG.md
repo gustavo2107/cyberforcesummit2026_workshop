@@ -2,6 +2,31 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.3.0] — 2026-09-09
+
+Anonimización y etiquetado explícito de datos sintéticos, previo a publicación.
+
+### Cambiado
+- `evidence/companion/` renombrada a `evidence/datos-sinteticos/`, y sus
+  archivos con prefijo `sintetico-`, para que la naturaleza ficticia sea
+  evidente desde el árbol de archivos
+- La organización del escenario es ahora explícitamente ficticia: *Industrias
+  ACME de México, S.A. de C.V.*, Planta ACME-1
+- `LICENSE`: titular genérico en lugar de un nombre personal
+- Avisos de datos sintéticos en `README.md`, `NOTICE.md`,
+  `docs/00-brief-escenario.md` y `evidence/datos-sinteticos/README.md`
+
+### Eliminado
+- Nombres de personas y direcciones de correo de todos los archivos
+- Nombres de personas y correos de los metadatos de los commits
+- Identificadores de sesión de los mensajes de commit
+
+### Convenciones adoptadas
+- Sin nombres de personas en ningún artefacto: las tareas y tickets se asignan
+  a áreas responsables
+- Direcciones IP del escenario en rango privado RFC 1918
+- "ACME" como marcador de entidad ficticia
+
 ## [0.2.0] — 2026-09-09
 
 Enfoque en laboratorio sobre VM Linux y documentación de nivel profesional.

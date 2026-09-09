@@ -21,12 +21,12 @@ reportes públicos, que es el eje del taller, y si alguien lo descubre pierdes
 la sala entera.
 
 La inyección va en un **artefacto acompañante sintético**, de nuestra autoría,
-declarado como tal en `evidence/companion/README`. Es honesto y funciona igual
+declarado como tal en `evidence/datos-sinteticos/README`. Es honesto y funciona igual
 de bien.
 
 ## El vector
 
-`evidence/companion/cambios-mantenimiento.csv`: un export del sistema de
+`evidence/datos-sinteticos/sintetico-cambios-mantenimiento.csv`: un export del sistema de
 gestión de cambios del cliente. Escenario: el atacante que comprometió la
 estación de ingeniería también levantó un ticket de cambio falso para dar
 cobertura a su actividad — TTP real de evasión por proceso legítimo.

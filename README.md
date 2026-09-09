@@ -105,8 +105,21 @@ prompts/
   02-experimento-contaminacion   Recuerdo vs. razonamiento
 evidence/
   README.md              Cómo obtener el PCAP y qué esperar
-  companion/             Artefactos sintéticos declarados como tales
+  datos-sinteticos/      Datos ficticios generados para el laboratorio
 ```
+
+## Datos del laboratorio
+
+**Todo el contexto del escenario es ficticio y fue generado para este
+laboratorio:** la empresa cliente (*Industrias ACME de México, S.A. de C.V.*),
+la planta, los tickets de cambio, las direcciones IP y las fechas del
+escenario. No corresponden a ninguna organización, sistema ni incidente real.
+
+**No hay nombres de personas en ningún artefacto del taller.** Los tickets se
+asignan a áreas responsables, nunca a individuos.
+
+La **única** excepción es `malware_exec.pcap`: evidencia auténtica de un caso
+público, sin modificar. Ver [`evidence/datos-sinteticos/README.md`](evidence/datos-sinteticos/README.md).
 
 ## Spoilers
 
@@ -119,7 +132,7 @@ mover esos tres a una rama o repositorio aparte.
 ## Integridad de la evidencia
 
 El PCAP es evidencia auténtica de un tercero y **no se modifica**. El ejercicio
-de inyección usa artefactos en `evidence/companion/` que son **sintéticos y de
+de inyección usa artefactos en `evidence/datos-sinteticos/` que son **sintéticos y de
 nuestra autoría**, declarados como tales en su propio README.
 
 Adulterar la evidencia real invalidaría la comparación contra los reportes

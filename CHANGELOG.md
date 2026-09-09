@@ -2,6 +2,22 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.7.0] — 2026-09-09
+
+### Agregado
+- `docs/10-ejecucion.md` — cierra el hueco entre "el entorno funciona" y "estoy
+  impartiendo el taller". El repositorio documentaba bien la provisión de la VM,
+  pero cuando `verify-setup.sh` daba verde no decía qué seguía: la secuencia
+  estaba repartida entre el workbook, la guía del instructor y los prompts, sin
+  que nada indicara el orden
+- **Plan B sin IA**: los comandos `tshark` que completan cada bloque del
+  workbook a mano, verificados uno por uno contra la evidencia. El laboratorio
+  ya no depende de que el proveedor de IA esté disponible
+
+### Cambiado
+- El README enlaza a `10-ejecucion.md` justo después del inicio rápido, para que
+  nadie termine el bootstrap sin saber a dónde ir
+
 ## [0.6.0] — 2026-09-09
 
 ### Agregado

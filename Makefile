@@ -64,6 +64,6 @@ check-docs:  ## Verifica que no falte ningún documento del taller
 	          docs/02-workbook.md docs/03-rubrica.md docs/04-lecturas.md \
 	          docs/05-inyeccion.md docs/06-herramientas.md \
 	          docs/07-laboratorio-vm.md docs/08-publicacion.md \
-	         docs/09-mapeo-attack.md; do \
+	         docs/09-mapeo-attack.md docs/10-ejecucion.md; do \
 		[[ -f "$$f" ]] && echo "  [ok] $$f" || echo "  [!!] FALTA $$f"; \
 	done

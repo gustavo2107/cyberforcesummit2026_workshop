@@ -106,6 +106,10 @@ LISTO — el taller es viable en esta maquina.
 
 Guía detallada de la VM: **[`docs/07-laboratorio-vm.md`](docs/07-laboratorio-vm.md)**
 
+**¿Ya tienes las cinco líneas en verde?** El siguiente documento es
+**[`docs/10-ejecucion.md`](docs/10-ejecucion.md)**: cómo se corre una sesión,
+en qué orden, y qué hacer si la IA no está disponible.
+
 > ⚠️ **No uses `sudo` para correr los scripts.** Wireshark deshabilita los
 > scripts Lua para superusuario, el disector no carga, y el síntoma es
 > silencioso: verás `UDP` en lugar de `TRISTATION`. Es la falla número uno de
@@ -172,6 +176,7 @@ docs/
   07-laboratorio-vm      Provisión de la VM, paso a paso
   08-publicacion         Checklist para pasar el repo a público
   09-mapeo-attack        Mapeo a MITRE ATT&CK for ICS v19.2
+  10-ejecucion           Cómo correr una sesión, y el plan B sin IA
 setup/
   SETUP.md               Instalación y trampas conocidas
   mcp-config.example.json

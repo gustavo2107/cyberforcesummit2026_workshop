@@ -12,6 +12,9 @@ Si vas a impartir el taller, léelos en este orden:
 3. **[07-laboratorio-vm.md](07-laboratorio-vm.md)** — construye la VM y
    verifícala. Hazlo pronto: si algo falla, quieres saberlo con semanas de
    margen.
+4. **[10-ejecucion.md](10-ejecucion.md)** — cómo se corre una sesión una vez
+   que el entorno está listo, y cómo completar el laboratorio con `tshark` a
+   secas si la IA no está disponible.
 4. **[06-herramientas.md](06-herramientas.md)** — qué hace cada pieza y por qué
    está elegida así.
 5. **[01-guia-instructor.md](01-guia-instructor.md)** ⚠️ — el guion minuto a
@@ -56,4 +59,5 @@ taller pierda la mitad de su valor.
 07-laboratorio-vm      Provisión de la VM, paso a paso.
 08-publicacion         Checklist para pasar el repo a público.
 09-mapeo-attack        Mapeo a MITRE ATT&CK for ICS.
+10-ejecucion           Cómo correr una sesión. Plan B sin IA.
 ```

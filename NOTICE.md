@@ -25,7 +25,7 @@ La rúbrica del taller se contrasta contra:
   dic 2017, y *A Totally Tubular Treatise on TRITON and TriStation*, jun 2018
 - **CISA** — *MAR-17-352-01 HatMan: Safety System Targeted Malware*
 - **Nozomi Networks** — Black Hat USA 2018, Andrea Carcano et al.
-- **MITRE ATT&CK for ICS** — Software S0013
+- **MITRE ATT&CK** — Triton (S1009) y campaña C0030, ATT&CK for ICS v19.2
 
 Enlaces completos en `docs/04-lecturas.md`.
 

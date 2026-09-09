@@ -2,6 +2,25 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.6.0] — 2026-09-09
+
+### Agregado
+- `docs/09-mapeo-attack.md` — mapeo a MITRE ATT&CK for ICS v19.2, verificado
+  contra las páginas vivas, con dos tablas separadas: lo demostrable con la
+  captura (8 técnicas) y lo documentado por los reportes (~30)
+
+### Corregido
+- **La referencia a MITRE era incorrecta.** El repositorio citaba a Triton como
+  S0013 en el wiki `collaborate.mitre.org/attackics`, descontinuado. En el
+  ATT&CK actual **S0013 es PlugX**. Las referencias correctas son S1009
+  (software) y C0030 (campaña)
+
+### Determinación analítica registrada
+- El download se mapea a **T0843.003 Program Append**, no a .001 ni .002:
+  `runState = Running` durante toda la captura descarta Download All, y el uso
+  de `Allocate program` apunta a append sobre edición. Corroborado por S1009
+  (`SafeAppendProgramMod`) y por el mapeo de MITRE de la campaña C0030
+
 ## [0.5.0] — 2026-09-09
 
 ### Agregado

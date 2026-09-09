@@ -55,4 +55,5 @@ taller pierda la mitad de su valor.
 06-herramientas        La cadena técnica y por qué.
 07-laboratorio-vm      Provisión de la VM, paso a paso.
 08-publicacion         Checklist para pasar el repo a público.
+09-mapeo-attack        Mapeo a MITRE ATT&CK for ICS.
 ```

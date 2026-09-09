@@ -57,9 +57,13 @@ PCAP, disector y honeypot. BSD-3-Clause.
 <https://www.midnightblue.nl/blog/analyzing-the-triton-industrial-malware>
 Ingeniería inversa independiente; buen contraste con los reportes comerciales.
 
-**MITRE ATT&CK for ICS — S0013**
-<https://collaborate.mitre.org/attackics/index.php/Software/S0013>
-Para la diapositiva de TTPs.
+**MITRE ATT&CK — Triton (S1009) y campaña C0030**
+<https://attack.mitre.org/software/S1009/>
+<https://attack.mitre.org/campaigns/C0030/>
+Para la diapositiva de TTPs. Ver el mapeo completo en `09-mapeo-attack.md`.
+
+> Cuidado con la referencia vieja: el wiki `collaborate.mitre.org/attackics`
+> está descontinuado, y en el ATT&CK actual **S0013 es PlugX**, no Triton.
 
 **DTIC — Cyber Risk to Mission Case Study: Triton**
 <https://apps.dtic.mil/sti/trecms/pdf/AD1183008.pdf>

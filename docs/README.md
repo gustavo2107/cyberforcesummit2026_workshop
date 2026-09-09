@@ -15,6 +15,9 @@ Si vas a impartir el taller, léelos en este orden:
 4. **[10-ejecucion.md](10-ejecucion.md)** — cómo se corre una sesión una vez
    que el entorno está listo, y cómo completar el laboratorio con `tshark` a
    secas si la IA no está disponible.
+5. **[11-descargas.md](11-descargas.md)** — todo lo que hay que bajar de
+   internet, con pesos y huellas. Léelo semanas antes: el WiFi de un venue no
+   aguanta a treinta personas descargando al mismo tiempo.
 4. **[06-herramientas.md](06-herramientas.md)** — qué hace cada pieza y por qué
    está elegida así.
 5. **[01-guia-instructor.md](01-guia-instructor.md)** ⚠️ — el guion minuto a
@@ -60,4 +63,5 @@ taller pierda la mitad de su valor.
 08-publicacion         Checklist para pasar el repo a público.
 09-mapeo-attack        Mapeo a MITRE ATT&CK for ICS.
 10-ejecucion           Cómo correr una sesión. Plan B sin IA.
+11-descargas           Inventario de descargas y paquete offline.
 ```

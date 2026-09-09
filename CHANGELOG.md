@@ -2,6 +2,19 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.8.0] — 2026-09-09
+
+### Agregado
+- `docs/11-descargas.md` — inventario completo de todo lo que hay que descargar.
+  Las instrucciones estaban repartidas en seis archivos y no había una lista
+  consolidada, que es justo lo que se necesita para pre-descargar y no depender
+  del WiFi del venue
+- Pesos medidos donde se pudo medir (tricotools 484 KB, gitleaks 7.8 MB),
+  huellas SHA-256 de verificación, y cómo pre-descargar los `.deb` con
+  `apt-get -d` para armar un paquete offline
+- Sección explícita de lo que **no** se descarga: el laboratorio no usa ni
+  distribuye binarios de malware
+
 ## [0.7.0] — 2026-09-09
 
 ### Agregado

@@ -106,6 +106,9 @@ LISTO — el taller es viable en esta maquina.
 
 Guía detallada de la VM: **[`docs/07-laboratorio-vm.md`](docs/07-laboratorio-vm.md)**
 
+Todo lo que se descarga —y su peso, sus huellas y qué llevar en USB— está
+inventariado en **[`docs/11-descargas.md`](docs/11-descargas.md)**.
+
 **¿Ya tienes las cinco líneas en verde?** El siguiente documento es
 **[`docs/10-ejecucion.md`](docs/10-ejecucion.md)**: cómo se corre una sesión,
 en qué orden, y qué hacer si la IA no está disponible.
@@ -177,6 +180,7 @@ docs/
   08-publicacion         Checklist para pasar el repo a público
   09-mapeo-attack        Mapeo a MITRE ATT&CK for ICS v19.2
   10-ejecucion           Cómo correr una sesión, y el plan B sin IA
+  11-descargas           Inventario de todo lo que hay que descargar
 setup/
   SETUP.md               Instalación y trampas conocidas
   mcp-config.example.json

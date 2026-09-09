@@ -38,6 +38,51 @@ es un protocolo propietario y apenas documentado, así que el modelo no puede
 resolverlo de memoria.** Tiene que trabajar con la evidencia o inventar — y
 ambas cosas se notan.
 
+### La cadena, de un vistazo
+
+```mermaid
+flowchart TB
+    PCAP["<b>malware_exec.pcap</b><br/>896 paquetes en 435 s<br/><i>evidencia real, sin modificar</i>"]
+
+    PCAP --> T1["tshark<br/><i>sin disector</i>"]
+    PCAP --> T2["tshark + TriStation.lua<br/><i>disector de Nozomi</i>"]
+
+    T1 --> R1["896 tramas de <b>data</b> sobre UDP<br/>Nada que interpretar"]
+    T2 --> R2["Protocolo <b>TRISTATION</b><br/>Códigos de función<br/>Estado del controlador<br/>Firmas de TRITON"]
+
+    R1 --> X["El modelo no razona sobre<br/>lo que no puede decodificar.<br/><b>Inventa.</b>"]
+    R2 --> MCP["Servidor <b>MCP</b><br/><i>puente IA ↔ tshark</i>"]
+
+    MCP --> IA["Asistente de IA"]
+    IA --> PART["Participante<br/><i>ancla cada afirmación</i>"]
+    PART --> REP["Hallazgo + número de trama<br/>+ comando que lo prueba"]
+    REP --> GT["Contraste contra<br/>Dragos · FireEye · CISA"]
+
+    classDef malo fill:#fdeaea,stroke:#c53030,color:#742a2a
+    classDef bien fill:#e6f4ea,stroke:#2f855a,color:#22543d
+    classDef ev fill:#e8eef7,stroke:#2b6cb0,color:#1a365d
+    class X,R1 malo
+    class R2,REP,GT bien
+    class PCAP ev
+```
+
+Léelo como una bifurcación. El mismo archivo entra por arriba y sale por dos
+caminos opuestos, y lo único que los separa son 45 KB de Lua.
+
+**La rama roja es el fracaso silencioso**, y es adonde llegas si el disector no
+está instalado o si el proceso corre como root. No hay mensaje de error: el
+asistente simplemente ve tráfico opaco y, como no puede decir "no sé", rellena
+con lo que recuerda de su entrenamiento. Un reporte fluido, seguro de sí mismo
+y falso.
+
+**La rama verde es el taller.** El disector convierte los bytes en códigos de
+función, estado del controlador y firmas; el MCP se los entrega al asistente
+como resultados de comandos reproducibles; y la regla de anclaje obliga a que
+cada afirmación llegue con la trama que la sostiene. Sólo entonces tiene
+sentido compararse contra lo que publicaron Dragos, FireEye y CISA.
+
+Todo el diseño del taller vive en esa bifurcación.
+
 ## Inicio rápido
 
 En una VM Ubuntu 24.04 limpia, **como usuario sin privilegios**:
@@ -77,6 +122,40 @@ make triton       Tramas donde el disector detecta TRITON
 make check-docs   Verifica que no falte documentación
 make hooks        Activa el hook de pre-commit (gitleaks)
 ```
+
+## Cómo transcurren las 2 horas
+
+```mermaid
+flowchart TB
+    A["<b>0:00</b> · Encuadre · 10 min<br/><i>la tesis y la regla de anclaje</i>"]
+    B["<b>0:10</b> · Verificación de entorno · 10 min"]
+    C["<b>0:20</b> · Bloques 1 y 2 · 15 min<br/><i>reconocimiento y forma del tráfico</i>"]
+    D["<b>0:35</b> · Bloque 3: la secuencia · 30 min<br/><i>construir la línea de tiempo</i>"]
+    E["<b>1:05</b> · Bloque 4: estado del equipo · 20 min<br/><i>aquí está el hallazgo</i>"]
+    F["<b>1:25</b> · Revelación y contraste · 15 min<br/><i>se abre la rúbrica</i>"]
+    G["<b>1:40</b> · Bloque 6: la inyección · 15 min<br/><i>la evidencia muerde</i>"]
+    H["<b>1:55</b> · Cierre · 5 min"]
+
+    A --> B --> C --> D --> E --> F --> G --> H
+
+    classDef clave fill:#fff4e5,stroke:#c05621,color:#7b341e
+    class E,F,G clave
+```
+
+Los tres bloques en ámbar son donde ocurre el aprendizaje; el resto los
+sostiene.
+
+La primera hora se siente cómoda: los participantes avanzan rápido y se
+confían. **El Bloque 4 es donde se atoran**, y no por dificultad técnica sino
+porque el dato que buscan es constante — 338 respuestas idénticas se leen como
+ruido, y tanto los humanos como los modelos descartan lo que no cambia.
+
+**La revelación** abre la rúbrica y permite medir: qué sacaron de la evidencia,
+qué les regaló el modelo de memoria, y qué inventó.
+
+**El Bloque 6** cierra dándole la vuelta al ejercicio: hasta ese momento la
+evidencia era algo que se analiza; ahí descubren que también es algo que puede
+atacarlos.
 
 ## Estructura
 

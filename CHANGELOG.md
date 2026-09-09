@@ -2,6 +2,21 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.5.0] — 2026-09-09
+
+### Agregado
+- Tres diagramas Mermaid, renderizados nativamente por GitHub:
+  - `README.md` — la cadena técnica, mostrando la bifurcación entre trabajar
+    con y sin el disector, que es donde vive todo el diseño del taller
+  - `README.md` — cómo transcurren las 2 horas, con los tres bloques donde
+    ocurre el aprendizaje resaltados
+  - `docs/03-rubrica.md` — la secuencia del ataque en cuatro fases, con el
+    `keyState` constante separado como condición y no como paso
+
+### Cambiado
+- Se retira la sección de higiene del README; las instrucciones para activar el
+  hook se reubican en `docs/06-herramientas.md`
+
 ## [0.4.0] — 2026-09-09
 
 Higiene del repositorio y preparación para publicación.

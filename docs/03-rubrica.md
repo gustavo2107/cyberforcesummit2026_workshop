@@ -17,6 +17,37 @@ laboratorio, con el PCAP *stripped*.
 
 ---
 
+## La secuencia, de un vistazo
+
+```mermaid
+flowchart TB
+    F1["<b>Fase 1</b> · 0 a 6.5 s<br/>Lectura de la lógica existente<br/><i>Upload program · Upload function</i>"]
+    F2["<b>Fase 2</b> · 6.7 a 7.7 s — PRIMERA ESCRITURA<br/>Start download change → Allocate program → End<br/><b>Trama 75: TRITON</b> · firma 0x423c976f<br/>El controlador responde <i>Modification accepted</i>"]
+    F3["<b>Fase 3</b> · 8.3 a 434 s<br/>Sigue leyendo durante 7 minutos<br/><i>verificación de la escritura</i>"]
+    F4["<b>Fase 4</b> · 434.2 a 435.1 s — SEGUNDA ESCRITURA<br/><b>Trama 887: TRITON</b> · firma 0xdfa1288d<br/>Trama 891: <b>Run program</b><br/>Trama 892: <b>Command rejected</b>"]
+    KEY["<b>Constante en las 338 respuestas de estado</b><br/>keyState = 0x01 [Program] · runState = 0x00 [Running]<br/>La llave física nunca salió de PROGRAM.<br/><i>Ése es el control que habría detenido todo.</i>"]
+
+    F1 --> F2 --> F3 --> F4
+    F4 -.-> KEY
+
+    classDef esc fill:#fdeaea,stroke:#c53030,color:#742a2a
+    classDef hallazgo fill:#fff4e5,stroke:#c05621,color:#7b341e
+    class F2,F4 esc
+    class KEY hallazgo
+```
+
+Las dos cajas rojas son los únicos momentos en que el atacante **escribe**. Todo
+lo demás —el 97% de las tramas— es leer y esperar.
+
+La caja ámbar no es una fase: es una condición que se mantuvo durante los 435
+segundos completos y que hizo posible todo lo anterior. Está separada con línea
+punteada porque no es un paso de la secuencia, es el terreno sobre el que la
+secuencia pudo ocurrir.
+
+Y fíjate en el final de la Fase 4: la ejecución **fue rechazada**. Es el detalle
+que separa a los equipos que leyeron la evidencia de los que la dieron por
+sabida.
+
 ## Bloque 1 — Reconocimiento
 
 | Punto | Respuesta | Verificación |

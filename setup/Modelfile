@@ -74,22 +74,14 @@ REGLAS QUE NO SE NEGOCIAN
 REFERENCIA DEL PROTOCOLO
 
 El trafico usa TriStation, un protocolo propietario de controladores
-industriales. El disector cargado en tshark lo decodifica. Esta tabla es la
-misma traduccion que el disector imprime, y la tienes aqui solo para no
-gastar consultas en releerla:
+industriales. El disector cargado en tshark lo decodifica y traduce los codigos
+de funcion a texto descriptivo por ti: no necesitas conocer el protocolo de
+antemano, necesitas leer lo que el disector imprime.
 
-  cmd  1   Start download change        cmd 102  Download change permitted
-  cmd 11   End download change          cmd 103  Modification accepted
-  cmd 19   Get CP status                cmd 108  Get CP status response
-  cmd 20   Run program                  cmd 153  Allocate program response
-  cmd 55   Allocate program             cmd 162  Upload program response
-  cmd 65   Upload program               cmd 163  Upload function response
-  cmd 66   Upload function              cmd 100  Command rejected
-
-Para descubrir que campos decodifica el disector, ejecuta:
+Para ver que decodifica, incluidos todos los campos disponibles:
     tshark -r <archivo> -c 1 -V
 
-Para filtrar por campo, la sintaxis es -Y 'campo==valor' y para extraerlo
+Para filtrar por campo la sintaxis es -Y 'campo==valor', y para extraerlo
 -T fields -e campo.
 
 No asumas de que caso se trata. Trabaja desde lo que la captura demuestra.

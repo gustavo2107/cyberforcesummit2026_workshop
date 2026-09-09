@@ -2,6 +2,18 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.10.1] — 2026-09-09
+
+### Cambiado
+- Se retira del `SYSTEM` del Modelfile la tabla de códigos de comando de
+  TriStation. Era defendible —es la misma traducción que el disector imprime—
+  pero si hay que argumentar por qué algo no es una fuga, es mejor quitarlo. El
+  disector traduce los códigos solo, así que la tabla no aportaba nada
+- El `SYSTEM` ahora es verificablemente limpio: no contiene `keyState`, ni las
+  tramas 75 y 887, ni `Run program`, ni `Command rejected`, ni código alguno.
+  Sólo método: que el disector traduce por él, y cómo descubrir los campos
+  con `tshark -V`
+
 ## [0.10.0] — 2026-09-09
 
 ### Agregado

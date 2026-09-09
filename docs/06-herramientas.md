@@ -67,14 +67,18 @@ Qué cambia, y por qué cada cosa:
   de llamar **una herramienta a la vez**. Esto último ataca una debilidad
   conocida de los modelos locales pequeños: encadenan llamadas en paralelo
   cuando cada paso depende del anterior.
-- **Una tabla de códigos de comando de TriStation**, que es la misma traducción
-  que el disector ya imprime. Está ahí para no gastar consultas releyéndola.
+**Dónde está la línea.** El `SYSTEM` **no contiene una sola respuesta del
+taller**, y eso es verificable: no menciona el `keyState`, ni las tramas 75 y
+887, ni que el `Run program` final fue rechazado, ni ningún código de comando.
 
-**Dónde está la línea.** El `SYSTEM` da **referencia de protocolo**, no
-respuestas. Los códigos de comando son lo que el disector muestra de todas
-formas, y para descubrir qué campos existen le dice al modelo que corra
-`tshark -V` — no se los lista. No menciona el `keyState`, ni las tramas 75 y
-887, ni que el `Run program` final fue rechazado. Eso lo tiene que encontrar.
+Lo único que le dice sobre el protocolo es que el disector traduce los códigos
+por él, y cómo descubrir los campos disponibles con `tshark -V`. Es método, no
+contenido.
+
+> Una versión anterior incluía una tabla de códigos de comando, argumentando que
+> era la misma traducción que el disector imprime. Se retiró: si hay que
+> argumentar por qué algo no es una fuga, es mejor quitarlo. La tabla tampoco
+> aportaba nada que el disector no diera solo.
 
 Es la misma información que un participante humano tiene a la mano en `docs/`.
 La diferencia es que el humano sabe leer un protocolo industrial y el modelo

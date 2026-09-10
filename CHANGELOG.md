@@ -2,6 +2,78 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.12.0] — 2026-09-10
+
+Primera corrida completa del laboratorio con el modelo local en la VM, de punta
+a punta. Todo lo que sigue está verificado corriendo, no leído de una fuente.
+
+### Corregido — el servidor MCP
+
+- **`mcp-wireshark` 0.5.0 NO funciona.** Instala limpio con `pipx` sobre Python
+  3.12.3 y revienta al listar herramientas:
+  `AttributeError: 'Server' object has no attribute 'list_tools'`. Es
+  incompatibilidad con el SDK actual de MCP; no hay flag que lo arregle
+- **El servidor del taller es ahora `wireshark-mcp`**
+  ([bx33661](https://github.com/bx33661/Wireshark-MCP)), `pipx install
+  wireshark-mcp`. Es el único que se probó hasta la salida
+- `setup/mcp-config.minimo.json` y `mcp-config.example.json` apuntan a él.
+  `mcp-wireshark` queda en el archivo de ejemplo marcado como no funcional
+- `scripts/bootstrap-vm.sh` lo instala solo, y el mensaje de cierre ya no manda
+  a elegir servidor ni usa `--mcp-server`
+
+> Se documentaba `mcp-wireshark` como "el más simple" habiendo comprobado sólo
+> que **se instalaba**. Instalar no es funcionar. La regla que queda para este
+> repositorio: nada se marca como verificado si la prueba no llegó a la salida.
+
+### Verificado — la cadena completa
+
+- `ollmcp` → `wireshark-mcp` → `tshark` del sistema → `TriStation.lua`
+- **El disector se hereda**, que era la incógnita que decidía si el taller era
+  viable. La prueba es el campo `frame.protocols`:
+  `"eth:ethertype:ip:udp:tristation"`
+- Documentado en `docs/07` §7.6 y `docs/10` §3.3 como comprobación explícita
+
+### Agregado — `docs/07` §7.5.1, fijar los parámetros en el cliente
+
+- `ollmcp` lleva su **propia** configuración de modelo. Puede arrancar sin
+  enviar `num_ctx`, `temperature` ni `seed` —se ven como `-` en el panel `/mc`—
+  y entonces el afinado del `Modelfile` **no se aplica**
+- Procedimiento: fijarlos en `/mc`, guardar con `/sc`; queda en
+  `~/.config/ollmcp/config.json`
+- Ese archivo tiene que estar **dentro de la OVA** antes de exportarla, o cada
+  participante arranca con una configuración distinta. Añadido a la lista de
+  verificación de `docs/07` §10 y al paquete offline de `docs/11`
+
+### Agregado — `docs/03`, los artefactos de la herramienta
+
+La sección nueva más importante del repositorio, y sale de lo que de verdad
+hizo el modelo en el ensayo: **un hallazgo crítico correcto envuelto en dos
+sobreinterpretaciones plausibles**.
+
+- Acertó las dos tramas con `TRITON malware detected!`
+- Leyó `Lua Error: TriStation.lua:611: negative length in tvb range` y concluyó
+  "paquetes corruptos". Es un **bug del disector** —dispara una vez, siempre la
+  misma trama— no una propiedad del tráfico
+- Leyó `Didn't find padding of zeros...` y lo ofreció como posible
+  "manipulación del paquete". Es un aviso normal de Wireshark sobre el relleno
+  de la trama Ethernet
+- Las reglas de anclaje **no atrapan esto**: el modelo etiquetó las dos como
+  `[EVIDENCIA]` y, en su lógica, lo eran. Falta la pregunta siguiente —*¿es una
+  propiedad del tráfico o del decodificador?*— que ahora es criterio de
+  calificación con peso alto
+
+### Agregado — artefactos de la herramienta y ritmo
+
+- La numeración de herramientas cambia entre versiones del servidor: se dicta
+  el **nombre**, nunca el número
+- Pedir la lista de paquetes con `limit: 1` devuelve cabeceras, no contenido
+- El resumen de *expert info* da frecuencias, **no números de trama**
+- **Cada consulta tardó del orden de tres minutos** sobre CPU en la VM de
+  referencia. Los tiempos de los bloques se dejan como están —dependen por
+  entero del equipo de cada quien— pero ahora la guía manda medirlo en el
+  ensayo y **decirlo en voz alta**: sin ese aviso alguien reinicia el cliente a
+  media consulta y pierde todo lo anclado
+
 ## [0.11.2] — 2026-09-10
 
 ### Corregido y verificado

@@ -132,14 +132,21 @@ tuya.
 
 ## Conectar el MCP de tshark
 
-Ver `mcp-config.example.json`. Opciones probadas por la comunidad:
+Usa **`wireshark-mcp`** ([bx33661](https://github.com/bx33661/Wireshark-MCP)),
+que es el único verificado corriendo en esta cadena:
 
-- [`0xKoda/WireMCP`](https://github.com/0xKoda/WireMCP)
-- [`bx33661/Wireshark-MCP`](https://github.com/bx33661/Wireshark-MCP)
-- [`khuynh22/mcp-wireshark`](https://github.com/khuynh22/mcp-wireshark)
-- [`tuliperis/SharkMCP`](https://github.com/tuliperis/SharkMCP)
+```bash
+pipx install wireshark-mcp
+ollmcp -m triton-analista -j setup/mcp-config.minimo.json
+```
 
-Elige uno y fíjalo con antelación: no cambies de MCP la semana del evento.
+Otras opciones existen —[`WireMCP`](https://github.com/0xKoda/WireMCP),
+[`SharkMCP`](https://github.com/tuliperis/SharkMCP)— y no están verificadas.
+[`mcp-wireshark`](https://github.com/khuynh22/mcp-wireshark) sí se probó: instala
+limpio y **no arranca** (`AttributeError` sobre `list_tools`). Ver
+`../docs/06-herramientas.md`.
+
+Fíjalo con antelación: no cambies de MCP la semana del evento.
 
 **Lo importante:** el MCP invoca `tshark` del sistema, así que **hereda el
 disector automáticamente** si está en la ruta de plugins del usuario que corre

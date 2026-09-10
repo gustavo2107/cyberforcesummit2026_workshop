@@ -12,30 +12,39 @@
     "El flag es --servers-json (-j). NO --mcp-server: ese espera la ruta a un",
     "script .py o .js, no el nombre de un binario.",
     "",
+    "El servidor de abajo, wireshark-mcp, es el unico verificado corriendo de",
+    "punta a punta: el modelo lo llama, el ejecuta el tshark del sistema y el",
+    "disector TriStation se hereda. Ver docs/07-laboratorio-vm.md, seccion 7.5.",
+    "",
     "CRITICO: el proceso NO debe correr como root. tshark deshabilita los",
     "scripts Lua para superusuario y el disector TriStation no cargara."
   ],
   "mcpServers": {
     "tshark": {
-      "command": "mcp-wireshark"
+      "command": "wireshark-mcp"
     }
   },
   "_alternativas": {
-    "_nota": "Reemplaza el bloque mcpServers de arriba por alguno de estos.",
-    "wireshark-mcp": {
-      "mcpServers": {
-        "tshark": {
-          "command": "wireshark-mcp"
-        }
-      }
-    },
-    "WireMCP (Node)": {
+    "_nota": [
+      "Reemplaza el bloque mcpServers de arriba por alguno de estos.",
+      "Ninguno de los dos esta verificado en esta cadena. mcp-wireshark 0.5.0",
+      "se probo y NO arranca: revienta con AttributeError sobre list_tools.",
+      "Ver docs/06-herramientas.md."
+    ],
+    "WireMCP (Node) — sin verificar": {
       "mcpServers": {
         "tshark": {
           "command": "node",
           "args": [
             "/home/analista/WireMCP/index.js"
           ]
+        }
+      }
+    },
+    "mcp-wireshark — NO FUNCIONA con el SDK actual de MCP": {
+      "mcpServers": {
+        "tshark": {
+          "command": "mcp-wireshark"
         }
       }
     }

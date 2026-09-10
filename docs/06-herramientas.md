@@ -13,8 +13,7 @@ Qué usa el taller, para qué sirve cada pieza y por qué está elegida así.
 | **Ollama** | — | Runtime del modelo local. Sirve los pesos por API en `localhost:11434`. |
 | **Qwen3.5 4B** | 3.4 GB | El analista. Elegido por su desempeño llamando herramientas, no por su prosa. |
 | **`ollmcp`** | — | Cliente MCP para Ollama. Conecta el modelo con los servidores por stdio. |
-| **`mcp-wireshark`** | 0.5.0 | Servidor MCP que expone `tshark`. Verificado sobre Python 3.12.3. |
-| MCP de tshark | variable | Puente entre el cliente y `tshark`. |
+| **`wireshark-mcp`** | ver `pipx list` | Servidor MCP que expone `tshark`. Verificado corriendo de punta a punta sobre Python 3.12.3. |
 | `capinfos` | viene con tshark | Metadatos de la captura (bloque 1 del workbook). |
 | `git` | cualquiera reciente | Obtener el repo y la evidencia. |
 
@@ -53,8 +52,14 @@ y como no sabe decir "se me olvidó", rellena. Culparlo de eso sería injusto.
 
 ```bash
 ollama create triton-analista -f setup/Modelfile
-ollmcp --model triton-analista --mcp-server <tu-config>
+ollmcp --model triton-analista --servers-json setup/mcp-config.minimo.json
 ```
+
+> **Construir la variante no basta.** `ollmcp` lleva su propia configuración de
+> modelo, y puede arrancar sin enviar `num_ctx`, `temperature` ni `seed` —los
+> verás como `-` en el panel `/mc`—, con lo que el afinado del `Modelfile` se
+> queda en el papel. Hay que fijarlos dentro del cliente y guardarlos con `/sc`.
+> El procedimiento está en `07-laboratorio-vm.md`, sección 7.5.1.
 
 Qué cambia, y por qué cada cosa:
 
@@ -126,12 +131,20 @@ consume.
 
 Opciones probadas por la comunidad, en orden de simplicidad de arranque:
 
-| Proyecto | Instalación | Nota |
+| Proyecto | Instalación | Estado |
 |---|---|---|
-| [`khuynh22/mcp-wireshark`](https://github.com/khuynh22/mcp-wireshark) | `pipx install mcp-wireshark` | Python 3.10+. Binario en el PATH. **El más simple** |
-| [`bx33661/Wireshark-MCP`](https://github.com/bx33661/Wireshark-MCP) | `pipx install wireshark-mcp` | Python 3.10+. Autoconfigura clientes detectados |
-| [`0xKoda/WireMCP`](https://github.com/0xKoda/WireMCP) | `git clone` + `npm install` | Node 16+. Se lanza con `node index.js` |
-| [`tuliperis/SharkMCP`](https://github.com/tuliperis/SharkMCP) | ver repositorio | Captura y análisis |
+| [`bx33661/Wireshark-MCP`](https://github.com/bx33661/Wireshark-MCP) | `pipx install wireshark-mcp` | **El que usa este taller. Verificado corriendo**, Python 3.12.3 |
+| [`khuynh22/mcp-wireshark`](https://github.com/khuynh22/mcp-wireshark) | `pipx install mcp-wireshark` | **Instala y no arranca** — ver abajo |
+| [`0xKoda/WireMCP`](https://github.com/0xKoda/WireMCP) | `git clone` + `npm install` | Sin verificar. Node 16+, se lanza con `node index.js` |
+| [`tuliperis/SharkMCP`](https://github.com/tuliperis/SharkMCP) | ver repositorio | Sin verificar. Captura y análisis |
+
+> **`mcp-wireshark` 0.5.0 no funciona con el SDK actual de MCP.** Instala limpio
+> con `pipx` y revienta al listar herramientas:
+> `AttributeError: 'Server' object has no attribute 'list_tools'`. No hay flag
+> que lo arregle. Está aquí por una razón: una versión previa de este documento
+> lo recomendaba como "el más simple" habiendo comprobado sólo que *se
+> instalaba*. Instalar no es funcionar, y en un taller esa diferencia se paga
+> en vivo.
 
 **Criterio de elección:** que invoque el `tshark` del sistema en lugar de traer
 su propio parser. Así hereda el disector automáticamente, sin escribir código.

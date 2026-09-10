@@ -173,6 +173,17 @@ else
     else
       warn "no se pudo instalar ollmcp; intenta: pipx install ollmcp"
     fi
+
+    # Servidor MCP que expone tshark al modelo.
+    #
+    # Es wireshark-mcp (bx33661) y no mcp-wireshark (khuynh22): el segundo
+    # instala limpio pero no arranca con el SDK actual de MCP -- revienta con
+    # "AttributeError: 'Server' object has no attribute 'list_tools'".
+    if pipx install wireshark-mcp >/dev/null 2>&1 || pipx upgrade wireshark-mcp >/dev/null 2>&1; then
+      ok "wireshark-mcp instalado (servidor MCP de tshark)"
+    else
+      warn "no se pudo instalar wireshark-mcp; intenta: pipx install wireshark-mcp"
+    fi
   else
     warn "pipx no disponible; instalalo con: sudo apt install pipx"
   fi
@@ -203,16 +214,31 @@ cat <<'EOF'
 ---------------------------------------------------------------------------
 Siguiente paso: conectar el servidor MCP de tshark.
 
-  1. Elige un servidor MCP  ->  docs/06-herramientas.md
-  2. Configuralo            ->  setup/mcp-config.example.json
-  3. Arranca el cliente:
-       ollmcp --model triton-analista --mcp-server <tu-config>
-  4. Validalo con la pregunta de control:
+  1. Arranca el cliente:
+       ollmcp -m triton-analista -j setup/mcp-config.minimo.json
+
+     El flag es --servers-json (-j). NO --mcp-server: ese espera la ruta a
+     un script .py o .js y responde "Server script not found".
+
+  2. Fija los parametros DENTRO del cliente -- este paso se salta solo:
+       /mc     -> num_ctx 8192, temperature 0.1, seed 42
+       /sc     -> guardar, queda en ~/.config/ollmcp/config.json
+
+     Si en /mc aparecen como "-", el cliente no los esta enviando y el
+     afinado del Modelfile se queda en el papel.  Ver docs/07 seccion 7.5.1.
+
+  3. Validalo con la pregunta de control:
        "Corre: tshark -r malware_exec.pcap -c 1 y dime el protocolo"
 
      Debe responder TRISTATION *y verse la llamada a la herramienta*.
        - Responde UDP            -> el disector no cargo (ver setup/SETUP.md)
        - Responde sin llamar     -> el modelo esta inventando. Cambialo.
+
+     La prueba dura de que el disector llego hasta el modelo es que
+     frame.protocols termine en ":tristation".
+
+  4. Cada consulta tarda del orden de minutos sobre CPU. Es normal.
+     Midelo en TU maquina y dilo en voz alta al abrir la sesion.
 
 Y cuando todo este en verde, TOMA UN SNAPSHOT de la VM.
   ->  docs/07-laboratorio-vm.md, paso 8

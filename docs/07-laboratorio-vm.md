@@ -251,67 +251,65 @@ confirmación humana. Requiere Python 3.11 o superior.
 
 ### 7.5 El servidor MCP de tshark
 
-Es la pieza que le da a `ollmcp` acceso a `tshark`. Hay varios proyectos y
-cualquiera sirve mientras cumpla el criterio: **que invoque el `tshark` del
-sistema en lugar de traer su propio parser**, para que herede el disector sin
-escribir código.
+Es la pieza que le da a `ollmcp` acceso a `tshark`. El criterio de elección es
+uno solo: **que invoque el `tshark` del sistema en lugar de traer su propio
+parser**. Así hereda el disector sin escribir una línea de código, y es la razón
+por la que este taller cabe en dos horas.
 
-| Proyecto | Cómo se instala | Notas |
-|---|---|---|
-| **`mcp-wireshark`** ([khuynh22](https://github.com/khuynh22/mcp-wireshark)) | `pipx install mcp-wireshark` | Python 3.10+. Deja el binario en el PATH. **El más simple, y el único verificado: v0.5.0 sobre Python 3.12.3.** |
-| **`wireshark-mcp`** ([bx33661](https://github.com/bx33661/Wireshark-MCP)) | `pipx install wireshark-mcp` | Python 3.10+. Trae `wireshark-mcp install`, que autoconfigura clientes detectados |
-| **`WireMCP`** ([0xKoda](https://github.com/0xKoda/WireMCP)) | `git clone` + `npm install` | Node 16+. Se lanza con `node /ruta/WireMCP/index.js` |
+**Usa `wireshark-mcp`.** Es el único de los candidatos que se probó corriendo de
+punta a punta en esta cadena, y funciona.
+
+```bash
+pipx install wireshark-mcp
+which wireshark-mcp          # → /home/analista/.local/bin/wireshark-mcp
+pipx list                    # anota la versión: va en tu bitácora del taller
+```
+
+> Se instala con **`pipx`, no con `pip`** — misma razón que `ollmcp`: PEP 668 en
+> Ubuntu 24.04. Y es una aplicación de línea de comandos, que es justo para lo
+> que `pipx` existe.
+
+#### Lo que se probó y no sirve
+
+`mcp-wireshark` **no arranca**. Instala limpio con `pipx` —v0.5.0 sobre Python
+3.12.3— y ahí se acaba la buena noticia: al primer intento de listar
+herramientas revienta.
+
+```
+AttributeError: 'Server' object has no attribute 'list_tools'
+```
+
+Es una incompatibilidad con el SDK actual de MCP, no un error de configuración:
+no hay flag que lo arregle. Queda documentado porque *instalar* no es
+*funcionar*, y una versión previa de esta guía lo recomendaba como "el más
+simple" habiendo verificado sólo que se instalaba. La lección aplica a todo el
+laboratorio: la única prueba que cuenta es la que llega hasta la salida.
+
+| Proyecto | Estado |
+|---|---|
+| **`wireshark-mcp`** ([bx33661](https://github.com/bx33661/Wireshark-MCP)) | **Verificado corriendo.** `pipx install wireshark-mcp` |
+| `mcp-wireshark` ([khuynh22](https://github.com/khuynh22/mcp-wireshark)) | **Instala pero no arranca** — `AttributeError` sobre `list_tools` |
+| `WireMCP` ([0xKoda](https://github.com/0xKoda/WireMCP)) | Sin verificar. Node 16+, `git clone` + `npm install` |
 
 **Fíjalo con semanas de antelación.** No cambies de servidor MCP la semana del
 evento.
 
-#### Ejemplo completo, con el más simple
-
-```bash
-pipx install mcp-wireshark
-which mcp-wireshark          # → /home/analista/.local/bin/mcp-wireshark
-```
-
-Salida esperada de la instalación:
-
-```
-  installed package mcp-wireshark 0.5.0, installed using Python 3.12.3
-  These apps are now globally available
-    - mcp-wireshark
-```
-
-> **Verificado** sobre Ubuntu 24.04 con Python 3.12.3, septiembre 2026. Es el
-> único de los tres que se probó instalando de verdad.
-
-Si eliges uno de Node en su lugar:
-
-```bash
-cd ~
-git clone https://github.com/0xKoda/WireMCP.git
-cd WireMCP && npm install
-# se lanza con: node ~/WireMCP/index.js
-```
-
-> Los dos primeros se instalan con **`pipx`, no con `pip`** — misma razón que
-> `ollmcp`: PEP 668 en Ubuntu 24.04. Y son aplicaciones de línea de comandos,
-> que es justo para lo que `pipx` existe.
-
 #### Conectarlo con el modelo
 
-La configuración va en formato MCP estándar. Toma
-`setup/mcp-config.example.json` como base y ajusta las rutas absolutas:
+La configuración va en formato MCP estándar y ya está escrita en
+`setup/mcp-config.minimo.json`:
 
 ```json
 {
   "mcpServers": {
     "tshark": {
-      "command": "mcp-wireshark"
+      "command": "wireshark-mcp"
     }
   }
 }
 ```
 
-Y arrancas el cliente apuntando a ese archivo:
+Arrancas el cliente apuntando a ese archivo:
 
 ```bash
 cd ~/taller
@@ -322,15 +320,61 @@ En corto: `ollmcp -m triton-analista -j setup/mcp-config.minimo.json`
 
 > **El flag es `--servers-json`, no `--mcp-server`.** Es el error fácil de
 > cometer: `--mcp-server` existe, pero espera **la ruta a un script `.py` o
-> `.js`**, no el nombre de un binario. Si le pasas `mcp-wireshark` responde
-> `Server script not found`. Para un servidor instalado como binario en el PATH,
-> la vía es el archivo JSON.
+> `.js`**, no el nombre de un binario. Si le pasas el nombre de un binario
+> responde `Server script not found`. Para un servidor instalado en el PATH, la
+> vía es el archivo JSON.
 >
 > Usa `mcp-config.minimo.json` y no `mcp-config.example.json`: el de ejemplo
 > lleva comentarios dentro del JSON para explicar las opciones, y un parser
 > estricto los rechaza.
 
 **Verificado** con `ollmcp` sobre Ubuntu 24.04, septiembre 2026.
+
+### 7.5.1 Fijar los parámetros dentro del cliente
+
+**Este paso no es opcional, y es el que más fácil se salta.**
+
+`ollmcp` mantiene su propia configuración de modelo. Aunque hayas construido
+`triton-analista` con el `Modelfile`, al abrir el panel de parámetros puedes
+encontrarte esto:
+
+```
+/mc
+```
+
+```
+num_ctx        -
+temperature    -
+seed           -
+```
+
+Un guión no quiere decir 8192, ni 0.1: quiere decir que **el cliente no está
+enviando ese parámetro**, y lo que acabe usando el runtime queda fuera de tu
+control. Con `num_ctx` sin fijar vuelves al problema de raíz — el modelo pierde
+la evidencia a media sesión y, como no sabe decir "se me olvidó", rellena.
+
+Fíjalos a mano en el panel `/mc`:
+
+| Parámetro | Valor |
+|---|---|
+| `num_ctx` | `8192` |
+| `temperature` | `0.1` |
+| `seed` | `42` |
+
+Y **guárdalos**, para que sobrevivan al siguiente arranque:
+
+```
+/sc
+```
+
+La configuración queda en `~/.config/ollmcp/config.json`. En la VM del taller,
+`/home/analista/.config/ollmcp/config.json`.
+
+> **Para la OVA:** ese archivo tiene que estar dentro de la imagen antes de
+> exportarla. Si no, cada participante arranca con los parámetros en `-` y el
+> laboratorio se comporta distinto en cada máquina — que es justo lo que la
+> snapshot existe para evitar. Confírmalo con `cat` antes de tomar el snapshot
+> del paso 8.
 
 ### 7.6 La validación
 
@@ -353,6 +397,43 @@ Dos formas de fallar, y conviene distinguirlas:
   inventando. Es el fallo que el taller entero enseña a detectar, y si lo hace
   en la validación lo va a hacer toda la sesión. Cambia de modelo antes de
   seguir.
+
+Cuando responde bien, la prueba de que el disector viajó hasta el modelo es el
+campo `frame.protocols`, que en esta captura termina en `tristation`:
+
+```
+"frame.protocols": "eth:ethertype:ip:udp:tristation"
+```
+
+Ésa es la línea que confirma que la cadena completa —`ollmcp` → `wireshark-mcp`
+→ `tshark` del sistema → `TriStation.lua`— está entera. Si termina en `udp`, el
+disector se quedó en el camino.
+
+#### Lo que vas a ver en pantalla, y conviene saber de antemano
+
+Tres cosas de la herramienta —no del caso— que salen en cuanto empiezas a
+consultar. Ninguna es un problema; todas confunden si te agarran en frío:
+
+- **Las herramientas se listan con `/tools`, y su numeración cambia entre
+  versiones del servidor.** No memorices números ni los pongas en el material
+  del participante: lo que se dicta en voz alta es el nombre.
+- **Pedir la lista de paquetes con `limit: 1` devuelve cabeceras, no
+  contenido.** Para ver los campos que decodifica el disector, la vía sigue
+  siendo `tshark -r <archivo> -c 1 -V`.
+- **El resumen de *expert info* da frecuencias, no números de trama.** Sirve
+  para saber *qué* aparece y *cuántas veces*; para saber *dónde*, hace falta
+  otra consulta.
+
+#### Cuánto tarda
+
+En la VM de referencia, cada consulta —la ida y vuelta completa: el modelo
+decide, llama la herramienta, lee el resultado y responde— tardó alrededor de
+**tres minutos** sobre CPU.
+
+Ese número depende por entero del equipo: núcleos, RAM y si hay GPU. Mídelo en
+tu ensayo, en la máquina que vas a usar, y **dilo en voz alta al abrir la
+sesión**. Un participante que espera respuesta instantánea cree que algo se
+rompió a los veinte segundos, y reinicia el cliente a media consulta.
 
 ### 7.7 Si el modelo local no da el ancho
 
@@ -399,7 +480,12 @@ descarga simultánea sobre el WiFi del venue.
 
 - [ ] VM construida y verificación en verde
 - [ ] **Modelo local descargado y respondiendo** (`ollama list`)
+- [ ] **`wireshark-mcp` instalado y arrancando** (`which wireshark-mcp`)
+- [ ] **Parámetros fijados en `/mc` y guardados con `/sc`** — que ninguno muestre `-`
+- [ ] **`~/.config/ollmcp/config.json` existe y está dentro de la imagen**
 - [ ] **La pregunta de control devuelve TRISTATION, con llamada visible a la herramienta**
+- [ ] **`frame.protocols` termina en `tristation`**
+- [ ] Tiempo por consulta medido en esta máquina, para decirlo en la sesión
 - [ ] Snapshot `baseline-verificada` tomada
 - [ ] Probada en una máquina **que no sea la tuya**, con 8 GB asignados
 - [ ] Huellas SHA-256 comunicadas a los participantes

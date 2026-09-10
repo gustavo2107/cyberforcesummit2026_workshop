@@ -201,6 +201,94 @@ constante, es el hallazgo del taller.
 
 ---
 
+## Los artefactos de la herramienta — el caso real que salió en el ensayo
+
+Esta sección no es sobre TRITON. Es sobre el modelo, y es el mejor material que
+tiene el taller para la discusión de cierre, porque **pasó de verdad** en la
+verificación del laboratorio, con el modelo local y el disector cargado.
+
+Al pedirle el resumen de *expert info* de la captura, la herramienta devolvió
+esto:
+
+```
+Errors (3)
+  1  Undecoded  TRISTATION  Lua Error: TriStation.lua:611: negative length in tvb range
+  2  Malformed  TRISTATION  TRITON malware detected!
+
+Notes (2)
+  2  Protocol   Ethertype   Didn't find padding of zeros...
+```
+
+El modelo produjo, a partir de ahí, **un hallazgo crítico correcto envuelto en
+dos sobreinterpretaciones perfectamente plausibles**.
+
+### Lo que acertó
+
+Reportó las dos tramas marcadas como `TRITON malware detected!`. Es correcto y
+es el hallazgo: viene del disector, que trae la firma, y se puede reproducir con
+`make triton`.
+
+### Sobreinterpretación 1 — el error de Lua
+
+El modelo leyó `Lua Error: TriStation.lua:611: negative length in tvb range` y
+concluyó que había **paquetes corruptos en la captura**.
+
+No los hay. Ese mensaje es **un bug del disector**, no una propiedad del
+tráfico: el script de Nozomi es de 2018, y en una trama de esta captura calcula
+un rango de longitud negativa y Lua lo aborta. Dispara **una vez**, siempre la
+misma, y es reproducible.
+
+La distinción que hay que hacerle ver a la sala: `Undecoded` significa *"la
+herramienta no pudo leer esto"*, no *"esto está dañado"*. Son cosas distintas y
+el reporte las funde en una sola frase.
+
+### Sobreinterpretación 2 — el relleno de ceros
+
+El modelo leyó `Didn't find padding of zeros...` y lo ofreció como posible
+**manipulación del paquete**.
+
+Tampoco. Ese aviso lo emite Wireshark sobre el relleno de la trama Ethernet
+cuando el paquete es más corto que el mínimo del medio. Aparece en capturas
+perfectamente normales y no dice nada sobre quién generó el tráfico.
+
+### Por qué esto es la mejor parte del taller
+
+Ninguna de las dos afirmaciones es un disparate. Las dos:
+
+- salieron de ejecutar un comando de verdad,
+- citan literalmente lo que la herramienta imprimió,
+- suenan a analista competente,
+- y **son falsas** — no sobre la evidencia, sino sobre qué es evidencia.
+
+Es el modo de falla que de verdad se ve en un SOC, y no es el que la gente
+espera. Nadie se imagina un modelo inventando de la nada; lo que hace es tomar
+la salida de la herramienta al pie de la letra y atribuirle al *tráfico* lo que
+son propiedades del *decodificador*.
+
+Las reglas de anclaje no lo atrapan solas. El modelo etiquetó las dos
+afirmaciones como `[EVIDENCIA]` — y en su lógica lo eran: salieron de un
+comando. Lo que falta es el paso siguiente, que hay que enseñar explícitamente:
+
+> **¿Esto es una propiedad del tráfico, o una propiedad de la herramienta que
+> lo está leyendo?**
+
+Ésa es la pregunta que cierra el taller.
+
+### Cómo usarlo en la sesión
+
+Dos opciones, según cómo venga el tiempo:
+
+1. **Que les pase a ellos.** Si algún equipo pide el resumen de *expert info*,
+   va a ver lo mismo. Déjalo correr y recógelo en la revelación.
+2. **Enseñarlo directo.** Proyecta el bloque de arriba, pide a la sala que
+   diga qué concluiría, y contrasta. Funciona igual de bien y no depende de
+   que alguien pregunte lo correcto.
+
+En cualquier caso, la salida de arriba es reproducible y está aquí para que
+puedas mostrarla aunque el modelo no coopere ese día.
+
+---
+
 ## Cómo calificar
 
 No califiques por conclusiones correctas. Califica por:
@@ -212,7 +300,10 @@ No califiques por conclusiones correctas. Califica por:
 4. **La lista de no-anclados** — ¿la entregaron con honestidad? Un equipo que
    entrega cinco afirmaciones no ancladas aprendió más que uno que entrega
    cero y las escondió. (peso: alto)
-5. Línea de tiempo y fases. (peso: medio)
+5. **La distinción herramienta/tráfico** — si su reporte incluye algo que en
+   realidad es un artefacto del disector o de Wireshark (ver la sección
+   anterior), ¿lo detectaron ellos o pasó al entregable? (peso: alto)
+6. Línea de tiempo y fases. (peso: medio)
 
 ---
 

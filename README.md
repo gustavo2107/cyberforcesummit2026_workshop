@@ -121,9 +121,24 @@ Guía detallada de la VM: **[`docs/07-laboratorio-vm.md`](docs/07-laboratorio-vm
 Todo lo que se descarga —y su peso, sus huellas y qué llevar en USB— está
 inventariado en **[`docs/11-descargas.md`](docs/11-descargas.md)**.
 
-**¿Ya tienes las cinco líneas en verde?** El siguiente documento es
-**[`docs/10-ejecucion.md`](docs/10-ejecucion.md)**: cómo se corre una sesión,
-en qué orden, y qué hacer si la IA no está disponible.
+**¿Ya tienes las líneas en verde?** Falta conectar el modelo con `tshark`:
+
+```bash
+ollmcp -m triton-analista -j setup/mcp-config.minimo.json
+```
+
+Y dentro del cliente, antes de la primera consulta:
+
+```
+/mc     → num_ctx 8192, temperature 0.1, seed 42
+/sc     → guardar
+```
+
+Si en `/mc` aparecen como `-`, el cliente no los está enviando y el afinado del
+`Modelfile` no se aplica. Es el paso que más fácil se salta.
+
+El siguiente documento es **[`docs/10-ejecucion.md`](docs/10-ejecucion.md)**:
+cómo se corre una sesión, en qué orden, y qué hacer si el modelo no coopera.
 
 > ⚠️ **No uses `sudo` para correr los scripts.** Wireshark deshabilita los
 > scripts Lua para superusuario, el disector no carga, y el síntoma es
@@ -195,7 +210,9 @@ docs/
   11-descargas           Inventario de todo lo que hay que descargar
 setup/
   SETUP.md               Instalación y trampas conocidas
-  mcp-config.example.json
+  Modelfile              Afinado del modelo local para trabajo forense
+  mcp-config.minimo.json El que se le pasa a ollmcp
+  mcp-config.example.json  El mismo, comentado y con alternativas
   Dockerfile             Alternativa a la VM
   docker-compose.yml
 scripts/

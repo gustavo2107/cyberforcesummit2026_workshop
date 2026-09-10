@@ -86,6 +86,26 @@ El flag es **`--servers-json`** (o `-j`). No `--mcp-server`: ése espera la ruta
 a un script `.py` o `.js`, no el nombre de un binario, y responde
 `Server script not found` si le pasas uno.
 
+El servidor que va en ese JSON es **`wireshark-mcp`**. `mcp-wireshark` instala
+pero no arranca — ver `07-laboratorio-vm.md`, sección 7.5.
+
+### 3.2.1 Revisar los parámetros antes de empezar
+
+Con el cliente arriba, abre el panel de modelo:
+
+```
+/mc
+```
+
+`num_ctx`, `temperature` y `seed` deben decir **8192**, **0.1** y **42**. Si
+alguno dice `-`, el cliente no lo está enviando: fíjalos ahí mismo y guárdalos
+con `/sc`.
+
+Es una comprobación de diez segundos que evita el fallo más caro de la sesión.
+Con `num_ctx` sin fijar, el modelo se queda sin contexto a media reconstrucción
+de la línea de tiempo y empieza a rellenar — y lo hace con la misma seguridad
+con la que venía citando tramas.
+
 ### 3.3 La pregunta de control
 
 **Antes de que llegue nadie**, y el mismo día — no la semana anterior:
@@ -107,6 +127,15 @@ Hay dos formas de fallar y conviene distinguirlas, porque se arreglan distinto:
 
 El segundo caso es el grave: es exactamente el fallo que el taller enseña a
 detectar, y si el modelo lo hace en la validación lo va a hacer toda la sesión.
+
+Cuando responde bien, la prueba dura de que el disector llegó hasta el modelo es
+el campo `frame.protocols`:
+
+```
+"frame.protocols": "eth:ethertype:ip:udp:tristation"
+```
+
+Si termina en `udp`, la cadena está rota aunque el modelo suene convincente.
 
 ---
 
@@ -149,6 +178,17 @@ para cada bloque, y también la lista de los que **no** hay que usar.
 
 Mientras trabajan, circula y siembra la pregunta incómoda: *¿tu asistente te dijo
 qué protocolo es antes de que tú se lo dijeras? ¿Cómo lo supo?*
+
+> **Advierte el ritmo antes de soltarlos.** Un modelo de 4B sobre CPU tarda del
+> orden de minutos por consulta —en la VM de referencia, alrededor de tres— y
+> eso varía mucho según el equipo de cada quien: núcleos, RAM y si hay GPU. Mide
+> el tuyo en el ensayo y dilo en voz alta. Sin ese aviso, alguien va a dar por
+> muerto el cliente a los veinte segundos y lo va a reiniciar a media consulta,
+> perdiendo el contexto de todo lo que llevaba anclado.
+>
+> El corolario práctico, que también conviene decir: **cada consulta cuesta**.
+> Vale más pensar la pregunta que dispararla. Los prompts de
+> `prompts/01-baseline.md` están escritos justamente para no gastar turnos.
 
 ### Paso 4 — La revelación
 

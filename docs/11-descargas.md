@@ -33,7 +33,7 @@ la guía para quien prefiera su propio entorno.
 | 4 | Evidencia y disector (tricotools) | **484 KB** | Sí | Al provisionar |
 | 5 | **Ollama** (runtime del modelo) | ~1.5 GB | Sí | Al provisionar |
 | 6 | **Pesos del modelo `qwen3.5:4b`** | **3.4 GB** | Sí | Al provisionar |
-| 6b | `ollmcp` (cliente MCP) + el servidor MCP | 5–50 MB | Sí | Al provisionar |
+| 6b | `ollmcp` (cliente) + `wireshark-mcp` (servidor) | ~20–50 MB | Sí | Al provisionar |
 | 7 | gitleaks | **7.8 MB** | No | Sólo quien commitea |
 | 8 | `crcmod` (pip) | < 1 MB | No | Sólo para el honeypot |
 | 9 | Docker | ~100 MB | No | Sólo ruta alternativa |
@@ -139,17 +139,25 @@ con la rúbrica. De paso es una lección de cadena de custodia que sale gratis.
 
 ---
 
-## 5. El MCP
+## 5. El servidor MCP
 
-Elige uno de [`06-herramientas.md`](06-herramientas.md) y **fíjalo con semanas
-de anticipación.** No cambies de MCP la semana del evento.
+```bash
+pipx install wireshark-mcp
+```
 
-Según el proyecto, se instala con `npm install -g` o con `pip install`. Los
-distribuidos por npm arrastran `nodejs` y `npm`, que suman al peso.
+Es el único verificado corriendo en esta cadena: el modelo lo llama, él ejecuta
+el `tshark` del sistema, y el disector se hereda.
+
+[`mcp-wireshark`](https://github.com/khuynh22/mcp-wireshark) **instala y no
+arranca** —revienta con `AttributeError` sobre `list_tools`—, y las demás
+opciones de [`06-herramientas.md`](06-herramientas.md) no están probadas en este
+laboratorio.
 
 > El criterio de elección no es el tamaño: es que invoque el `tshark` del
 > sistema en lugar de traer su propio parser. Así hereda el disector sin que
 > haya que escribir código.
+
+**Fíjalo con semanas de anticipación.** No cambies de MCP la semana del evento.
 
 ---
 
@@ -255,6 +263,11 @@ Lo que conviene llevar en USB el día del evento:
       monta su VM en el momento
 - [ ] El **video de respaldo** del flujo completo
 - [ ] Las huellas SHA-256 impresas o en un archivo de texto
+
+Y dentro de la OVA, antes de exportarla:
+
+- [ ] `~/.config/ollmcp/config.json` con los parámetros ya guardados — si falta,
+      cada participante arranca con `num_ctx`, `temperature` y `seed` en `-`
 
 Dos memorias, no una. Circulan en paralelo y una se puede corromper.
 

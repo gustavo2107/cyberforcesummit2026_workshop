@@ -171,6 +171,7 @@
   }
   tr:nth-child(even) td { background: #fafbfc; }
   td code { font-size: 8.1pt; }
+  th code { background: transparent; color: inherit; font-size: 8.3pt; }
 
   .salida {
     background: #10161f;
@@ -528,7 +529,194 @@ minutos</b> sobre CPU.</p>
 (<code>SIN_MODELO=1 make bootstrap</code>). Pierdes la independencia de la red del
 venue y ganas capacidad. <b>Decídelo en tu ensayo, no en el salón.</b></p>
 
-<h2><span class="num">5</span>Snapshot<span class="tiempo">5 min</span></h2>
+<h2 class="salto"><span class="num">5</span>El guion de la sesión<span class="tiempo">—</span></h2>
+
+<p>Lo que se pega en el cliente, en orden. Cada consulta trae qué debe llamar el modelo,
+qué debe salir, y <b>el comando con el que tú lo compruebas</b> mientras circulas por la
+sala. Los mismos prompts sin las respuestas están en
+<code>prompts/01-baseline.md</code> — ése es el que se reparte.</p>
+
+<div class="alerta">
+  <b>Antes de la primera consulta va <code>00-reglas-de-anclaje.md</code></b>
+  Sin excepción, y aunque el <code>Modelfile</code> ya las traiga en su
+  <code>SYSTEM</code>: en el ensayo el modelo respondió sin una sola etiqueta hasta que
+  se le recordaron. Un 4B con razonamiento encendido gasta su obediencia en pensar, no
+  en formatear.
+</div>
+
+<h3>Las nueve herramientas, y su equivalente en tshark</h3>
+
+<table>
+  <tr><th style="width:34%">Herramienta</th><th style="width:41%">Qué hace</th><th>En <code>tshark</code></th></tr>
+  <tr><td><code>wireshark_open_file</code></td><td>Abre la captura y lista los protocolos. La puerta de entrada</td><td><code>-z io,phs</code></td></tr>
+  <tr><td><code>wireshark_get_file_info</code></td><td>Tramas, duración, tamaño y <b>SHA-256</b></td><td><code>capinfos</code></td></tr>
+  <tr><td><code>wireshark_stats_protocol_hierarchy</code></td><td>Jerarquía de protocolos con conteo por capa</td><td><code>-q -z io,phs</code></td></tr>
+  <tr><td><code>wireshark_stats_conversations</code></td><td>Quién habla con quién, con paquetes y bytes</td><td><code>-q -z conv,ip</code></td></tr>
+  <tr><td><code>wireshark_stats_expert_info</code></td><td>Lo que el disector marca como error, aviso o nota</td><td><code>-q -z expert</code></td></tr>
+  <tr><td><code>wireshark_get_packet_list</code></td><td>Lista de tramas — el panel de arriba de Wireshark</td><td><code>-T fields</code></td></tr>
+  <tr><td><code>wireshark_get_packet_details</code></td><td>Una trama, decodificada entera</td><td><code>-c 1 -V</code></td></tr>
+  <tr><td><code>wireshark_extract_fields</code></td><td>Extrae campos concretos, en tabla</td><td><code>-T fields -e campo</code></td></tr>
+  <tr><td><code>wireshark_search_packets</code></td><td>Busca por contenido: texto, hex o regex</td><td><code>-Y 'frame contains'</code></td></tr>
+</table>
+
+<div class="nota">
+  <b>Los tres parámetros que cambian todo</b>
+  <b><code>display_filter</code></b> filtra <i>antes</i> de devolver — sin él llegan 896
+  líneas, casi todas vacías. <b><code>custom_columns</code></b> elige las columnas, y
+  convierte la línea de tiempo en <b>una sola llamada</b>. <b><code>limit</code></b> por
+  omisión es 20 en <code>get_packet_list</code> y 100 en <code>extract_fields</code>: es
+  lo que produce el <code>[Showing 100/897 lines]</code> del que el modelo generaliza.
+  <b>Enseña a pedir los tres explícitos.</b>
+</div>
+
+<h3>Bloque 1 — Reconocimiento</h3>
+
+<pre><code>Abre /home/analista/taller/evidence/tricotools/malware_exec.pcap.
+No te voy a decir de qué entorno viene ni qué protocolo esperar.
+
+Dime cuántos paquetes trae, cuánto dura la captura y su SHA-256.
+Nombra la herramienta que usaste.</code></pre>
+
+<p><b>Debe salir:</b> 896 tramas · 435.39 s · <code>3fd16a17…ad90</code> ·
+<code>tristation</code> entre los protocolos. &nbsp;<b>Compruébalo:</b>
+<code>capinfos $PCAP</code></p>
+
+<pre><code>¿Qué hosts participan y en qué puertos? ¿Cuál dirías que es el cliente
+y cuál el dispositivo? Justifícalo con algo medible y marca la
+justificación como [INFERENCIA].</code></pre>
+
+<p><b>Debe salir:</b> <code>192.168.1.88</code> ↔ <code>192.168.1.2</code>, UDP
+<b>1502</b>. &nbsp;<b>Compruébalo:</b> <code>tshark -r $PCAP -q -z conv,ip</code></p>
+
+<h3>Bloque 2 — La forma del tráfico</h3>
+
+<pre><code>Dame la jerarquía de protocolos de la captura.</code></pre>
+
+<p><b>Debe salir:</b> <code>tristation</code> en 896, <code>ts.crc16</code> en <b>895</b>,
+<code>text</code> en <b>1</b>. &nbsp;<b>Compruébalo:</b>
+<code>tshark -r $PCAP -q -z io,phs</code></p>
+
+<div class="nota">
+  <b>Dos asimetrías que ningún equipo mira</b>
+  Una trama de 896 no tiene CRC y trae una capa de texto — casi con seguridad la misma
+  que dispara el error de Lua del disector. Siembra la pregunta: <i>¿por qué 895 y no
+  896?</i>
+</div>
+
+<pre><code>Extrae el campo ts.ts_cmd usando display_filter "ts.ts_cmd" y limit 900.
+Dame la distribución de valores ordenada por frecuencia.
+Si la salida viene truncada, dímelo en lugar de generalizar.</code></pre>
+
+<p><b>Debe salir:</b> <code>19</code> y <code>108</code> dominan — <b>676 tramas, el
+75%</b>. &nbsp;<b>Compruébalo:</b>
+<code>tshark -r $PCAP -T fields -e ts.ts_cmd | sort -n | uniq -c | sort -rn</code></p>
+
+<pre><code>Dos comandos dominan y aparecen emparejados. Dime cuáles son, qué
+porcentaje representan y qué hipótesis tienes sobre su función.
+Marca la hipótesis como [INFERENCIA].
+
+Después dime cuántas tramas quedan si los filtras, y qué comandos
+aparecen en ellas.</code></pre>
+
+<h3>Bloque 3 — La secuencia</h3>
+
+<pre><code>Dame la lista de paquetes con:
+  display_filter: ts.ts_cmd &amp;&amp; ts.ts_cmd!=19 &amp;&amp; ts.ts_cmd!=108
+  custom_columns: frame.number,frame.time_relative,ip.src,ts.ts_cmd
+  limit: 250
+
+Ésa es la línea de tiempo sin el ruido de fondo.</code></pre>
+
+<div class="alerta">
+  <b>Ésta es la consulta que enseña la técnica</b>
+  Filtrar y elegir columnas convierte lo que serían cinco consultas de tres minutos en
+  una. Si un equipo aprende sólo una cosa técnica del taller, que sea ésta.
+</div>
+
+<pre><code>Agrupa esas tramas en fases por comportamiento y ponle nombre a cada una.
+Cada fase con trama de inicio, trama de fin y tiempo relativo.
+No inventes fases que no se sostengan en las tramas que ya viste.</code></pre>
+
+<pre><code>¿Hay un patrón de comandos que se repita y que parezca marcar el inicio
+de una operación de escritura? Muéstrame todas sus ocurrencias con
+números de trama, y para cada una, qué respondió el dispositivo.</code></pre>
+
+<pre><code>Dame las últimas 10 tramas de esa línea de tiempo filtrada.
+¿Cuál es el último comando significativo que envía el cliente, y qué
+respondió el dispositivo exactamente? Léelo antes de interpretarlo.</code></pre>
+
+<p><b>Debe salir:</b> el <i>Run program</i> final <b>fue rechazado</b>.
+&nbsp;<b>Tu chuleta:</b>
+<code>tshark -r $PCAP -Y 'frame.number&gt;=889 &amp;&amp; frame.number&lt;=892' -T fields -e frame.number -e ip.src -e ts.ts_cmd</code>
+— no dictes esos números a la sala.</p>
+
+<h3>Bloque 4 — El estado del controlador</h3>
+
+<pre><code>El comando de respuesta más frecuente trae información de estado.
+Toma una trama de ésas y dame TODOS los campos que el disector decodifica
+en ella, con su valor.</code></pre>
+
+<p><b>Compruébalo:</b> <code>tshark -r $PCAP -Y 'ts.ts_cmd==108' -c 1 -V</code> — es el
+comando que revela qué campos existen, y sin él nadie sabe qué pedir.</p>
+
+<pre><code>¿Alguno de esos campos describe el estado de un control físico del equipo?
+
+Extrae ts.ts_cp_keyState y ts.ts_cp_runState con:
+  display_filter: ts.ts_cp_keyState
+  limit: 400
+
+Dime en cuántas tramas aparece y si el valor cambia a lo largo de la
+captura. Si la salida viene truncada, dilo en lugar de generalizar.</code></pre>
+
+<p><b>Debe salir:</b> <b>338 tramas</b>, <code>keyState = 0x01</code> constante.
+&nbsp;<b>Compruébalo:</b>
+<code>tshark -r $PCAP -Y 'ts.ts_cp_keyState' -T fields -e ts.ts_cp_keyState -e ts.ts_cp_runState | sort | uniq -c</code></p>
+
+<pre><code>Ese valor: ¿qué implica operativamente? Marca claramente qué parte de tu
+respuesta es [EVIDENCIA] de esta captura y qué parte es [CONOCIMIENTO] de
+tu entrenamiento sobre este tipo de equipo.</code></pre>
+
+<div class="alerta">
+  <b>Aquí se cierra el taller — y aquí el modelo falla</b>
+  En el ensayo tradujo <i>key</i> como <b>tecla</b> —"estado de la tecla, 0x01 =
+  presionada"— en vez de <b>llave física</b>. Y lo etiquetó <code>[CONOCIMIENTO]</code>,
+  correctamente. El disector entrega el campo; el significado lo pone el humano. Deja
+  que la sala lo vea antes de abrir la rúbrica.
+</div>
+
+<h3>Los prompts que NO se deben usar</h3>
+
+<table>
+  <tr><th style="width:38%">Prompt</th><th>Por qué arruina el ejercicio</th></tr>
+  <tr><td>"¿Qué malware es este?"</td><td>Invita al modelo a recitar entrenamiento</td></tr>
+  <tr><td>"Resume qué pasó"</td><td>Produce narrativa sin anclaje</td></tr>
+  <tr><td>"¿Es esto TRITON?"</td><td>Pregunta cerrada: dirá que sí y construirá la evidencia hacia atrás</td></tr>
+  <tr><td>"Dame los IOCs"</td><td>No hay IOCs útiles aquí; pedirlos es invitar a que los invente</td></tr>
+  <tr><td>"Corre un análisis de seguridad completo"</td><td>Dispara la detección automática, que sobre tráfico industrial devuelve ruido plausible</td></tr>
+</table>
+
+<p><b>La pregunta cerrada obtiene la respuesta que sugiere.</b> En forense, la diferencia
+entre un buen prompt y uno malo es la misma que entre una buena y una mala pregunta en un
+interrogatorio.</p>
+
+<h3>Las tres preguntas de control</h3>
+
+<p>Para el participante, cuando algo le suene demasiado redondo. Cuestan una consulta y
+evitan meter una invención en el reporte.</p>
+
+<pre><code>¿De qué comando exacto salió esa afirmación? Pégame la salida cruda.
+
+Ese número de trama, ¿lo leíste de una columna de números de trama, o de
+otra columna? Enséñame la línea de donde lo sacaste.
+
+¿Eso es una propiedad del tráfico capturado, o del programa que lo está
+decodificando?</code></pre>
+
+<p>La tercera es la que más veces va a cambiar un reporte. Una pista rápida para
+contestarla: <b>si algo aparece en el 100% de las tramas, es del instrumento, no del
+incidente.</b></p>
+
+<h2><span class="num">6</span>Snapshot<span class="tiempo">5 min</span></h2>
 
 <p>Con la verificación en verde y el MCP respondiendo TRISTATION, limpia y congela:</p>
 
@@ -542,7 +730,7 @@ sudo rm -rf /tmp/*</code></pre>
 <p>Es tu red de seguridad: si un participante destruye su entorno a media sesión, reviertes
 en treinta segundos en lugar de perderlo. <b>Tómala después de verificar, nunca antes.</b></p>
 
-<h2><span class="num">6</span>Ensayar<span class="tiempo">2 h</span></h2>
+<h2><span class="num">7</span>Ensayar<span class="tiempo">2 h</span></h2>
 
 <p>El paso que todo mundo se salta y del que todo mundo se arrepiente. Corre el workbook
 completo tú mismo, con cronómetro, como si fueras participante — sin abrir la rúbrica.</p>
@@ -728,7 +916,7 @@ común desapareció. Pero el video sigue sin ser opcional, por otra razón: <b>u
 pequeño puede portarse mal en vivo</b>. Si eso pasa, el video te deja seguir dando el
 taller como demo guiada en lugar de perderlo.</p>
 
-<h2><span class="num">7</span>Semana del taller<span class="tiempo">—</span></h2>
+<h2><span class="num">8</span>Semana del taller<span class="tiempo">—</span></h2>
 
 <ul class="check">
   <li>Publicar el brief y la guía de la VM <b>48 horas antes</b> — que nadie descargue nada en el salón</li>
@@ -745,7 +933,7 @@ taller como demo guiada en lugar de perderlo.</p>
   <li>Probar la VM en una máquina <b>que no sea la tuya</b></li>
 </ul>
 
-<h2><span class="num">8</span>Tarjeta de fallas<span class="tiempo">—</span></h2>
+<h2><span class="num">9</span>Tarjeta de fallas<span class="tiempo">—</span></h2>
 
 <table>
   <tr><th style="width:31%">Síntoma</th><th style="width:31%">Causa</th><th>Solución</th></tr>
@@ -817,7 +1005,7 @@ taller como demo guiada en lugar de perderlo.</p>
   <tr>
     <td>El modelo habla de "estado de la tecla"</td>
     <td>Tradujo <i>key</i> como tecla, no como llave física</td>
-    <td>No se arregla: <b>es la tesis del taller.</b> Ver la sección 6</td>
+    <td>No se arregla: <b>es la tesis del taller.</b> Ver la sección 7</td>
   </tr>
   <tr>
     <td><code>Server script not found</code></td>
@@ -837,7 +1025,7 @@ taller como demo guiada en lugar de perderlo.</p>
   <tr>
     <td>El modelo reporta "paquetes corruptos"</td>
     <td>Leyó el bug de Lua del disector como propiedad del tráfico</td>
-    <td>No se arregla: <b>es material del taller.</b> Ver la sección 6</td>
+    <td>No se arregla: <b>es material del taller.</b> Ver la sección 7</td>
   </tr>
   <tr>
     <td>El asistente inventa IOCs o dominios</td>
@@ -851,7 +1039,7 @@ taller como demo guiada en lugar de perderlo.</p>
   </tr>
 </table>
 
-<h2><span class="num">9</span>Referencia rápida<span class="tiempo">—</span></h2>
+<h2><span class="num">10</span>Referencia rápida<span class="tiempo">—</span></h2>
 
 <table>
   <tr><th style="width:34%">Comando</th><th>Qué hace</th></tr>

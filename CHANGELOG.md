@@ -2,6 +2,19 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.11.1] — 2026-09-10
+
+### Verificado
+- **`mcp-wireshark` 0.5.0 instala correctamente con `pipx`** en Ubuntu 24.04 con
+  Python 3.12.3. El binario queda en `~/.local/bin/mcp-wireshark`. Es el primer
+  eslabón de la cadena del modelo local que pasa de "documentado desde fuentes"
+  a "verificado corriendo"
+- La versión queda fijada en la documentación, igual que tshark 4.2.2
+
+### Agregado
+- `setup/mcp-config.minimo.json` — configuración sin comentarios ni claves
+  auxiliares, por si el cliente rechaza el JSON comentado del archivo de ejemplo
+
 ## [0.11.0] — 2026-09-10
 
 ### Cambiado

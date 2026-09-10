@@ -258,7 +258,7 @@ escribir código.
 
 | Proyecto | Cómo se instala | Notas |
 |---|---|---|
-| **`mcp-wireshark`** ([khuynh22](https://github.com/khuynh22/mcp-wireshark)) | `pipx install mcp-wireshark` | Python 3.10+. Deja el binario `mcp-wireshark` en el PATH. **El más simple.** |
+| **`mcp-wireshark`** ([khuynh22](https://github.com/khuynh22/mcp-wireshark)) | `pipx install mcp-wireshark` | Python 3.10+. Deja el binario en el PATH. **El más simple, y el único verificado: v0.5.0 sobre Python 3.12.3.** |
 | **`wireshark-mcp`** ([bx33661](https://github.com/bx33661/Wireshark-MCP)) | `pipx install wireshark-mcp` | Python 3.10+. Trae `wireshark-mcp install`, que autoconfigura clientes detectados |
 | **`WireMCP`** ([0xKoda](https://github.com/0xKoda/WireMCP)) | `git clone` + `npm install` | Node 16+. Se lanza con `node /ruta/WireMCP/index.js` |
 
@@ -269,8 +269,19 @@ evento.
 
 ```bash
 pipx install mcp-wireshark
-which mcp-wireshark          # confirma que quedó en el PATH
+which mcp-wireshark          # → /home/analista/.local/bin/mcp-wireshark
 ```
+
+Salida esperada de la instalación:
+
+```
+  installed package mcp-wireshark 0.5.0, installed using Python 3.12.3
+  These apps are now globally available
+    - mcp-wireshark
+```
+
+> **Verificado** sobre Ubuntu 24.04 con Python 3.12.3, septiembre 2026. Es el
+> único de los tres que se probó instalando de verdad.
 
 Si eliges uno de Node en su lugar:
 

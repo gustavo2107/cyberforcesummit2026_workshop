@@ -13,6 +13,7 @@ Qué usa el taller, para qué sirve cada pieza y por qué está elegida así.
 | **Ollama** | — | Runtime del modelo local. Sirve los pesos por API en `localhost:11434`. |
 | **Qwen3.5 4B** | 3.4 GB | El analista. Elegido por su desempeño llamando herramientas, no por su prosa. |
 | **`ollmcp`** | — | Cliente MCP para Ollama. Conecta el modelo con los servidores por stdio. |
+| **`mcp-wireshark`** | 0.5.0 | Servidor MCP que expone `tshark`. Verificado sobre Python 3.12.3. |
 | MCP de tshark | variable | Puente entre el cliente y `tshark`. |
 | `capinfos` | viene con tshark | Metadatos de la captura (bloque 1 del workbook). |
 | `git` | cualquiera reciente | Obtener el repo y la evidencia. |

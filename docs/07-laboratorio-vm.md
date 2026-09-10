@@ -60,7 +60,7 @@ Si sólo te vas a llevar una cosa de este documento, que sea ésta.
 
 ```bash
 sudo apt update
-sudo apt install -y git python3 python3-pip jq curl ca-certificates
+sudo apt install -y git python3 python3-pip pipx jq curl ca-certificates
 ```
 
 ### tshark
@@ -225,12 +225,21 @@ al analista.
 ### 7.4 El cliente MCP
 
 ```bash
-pip install --user --upgrade ollmcp
+pipx install ollmcp
+pipx ensurepath
+exec $SHELL          # recarga el PATH
+ollmcp --help        # confirma
 ```
 
 `ollmcp` es el puente: conecta el modelo de Ollama con los servidores MCP por
 stdio, maneja el ciclo de llamada a herramientas y tiene modo agente y
 confirmación humana. Requiere Python 3.11 o superior.
+
+> **Se instala con `pipx`, no con `pip`.** Desde Ubuntu 24.04 rige PEP 668:
+> `pip install --user` falla con `externally-managed-environment` porque el
+> Python del sistema está gestionado por apt. `pipx` es además la vía correcta
+> para una aplicación de línea de comandos — le crea su propio entorno aislado
+> y la deja en el PATH, sin tocar el Python del sistema.
 
 ### 7.5 El servidor MCP de tshark
 

@@ -92,7 +92,26 @@ tshark -G protocols | grep -i tristation
 
 Sin salida = el disector no cargó. Vuelve a la trampa 1.
 
-### 4. Versión de Wireshark
+### 4. `pip install` falla con `externally-managed-environment`
+
+Desde Ubuntu 24.04 rige PEP 668: el Python del sistema lo gestiona apt, y
+`pip install --user` se rechaza para no romperlo.
+
+```bash
+# mal, en Ubuntu 24.04
+pip install --user ollmcp        # error: externally-managed-environment
+
+# bien: pipx, que ademas es la via correcta para una aplicacion de CLI
+sudo apt install -y pipx
+pipx install ollmcp
+pipx ensurepath && exec $SHELL   # para que quede en el PATH
+```
+
+Para **librerías** (no aplicaciones), como `crcmod`, `pipx` no aplica: se toman
+del repositorio del sistema con `sudo apt install python3-crcmod`, o en último
+caso con `pip install --break-system-packages`.
+
+### 5. Versión de Wireshark
 
 Probado en **4.2.2 con Lua 5.2.4**. El disector es de 2018; en versiones muy
 nuevas podría requerir ajustes. Verifica en la máquina del taller, no en la

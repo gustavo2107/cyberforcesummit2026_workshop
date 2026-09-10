@@ -68,9 +68,9 @@ if [[ "${PKG}" == "apt" ]]; then
 
   sudo apt-get update -qq
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-    tshark git python3 python3-pip jq curl ca-certificates
+    tshark git python3 python3-pip pipx jq curl ca-certificates
 else
-  sudo dnf install -y -q wireshark-cli git python3 python3-pip jq curl
+  sudo dnf install -y -q wireshark-cli git python3 python3-pip pipx jq curl
 fi
 
 command -v tshark >/dev/null 2>&1 || die "tshark no quedo instalado"
@@ -158,11 +158,23 @@ else
     fi
   fi
 
-  # Cliente MCP para Ollama
-  if pip3 install --user --quiet --upgrade ollmcp 2>/dev/null; then
-    ok "ollmcp instalado (cliente MCP para modelos locales)"
+  # Cliente MCP para Ollama.
+  #
+  # Se instala con pipx y no con pip: desde Ubuntu 24.04 rige PEP 668, que
+  # bloquea 'pip install --user' con "externally-managed-environment". pipx es
+  # ademas la via correcta para una aplicacion de linea de comandos: le crea su
+  # propio entorno aislado y la deja en el PATH.
+  if command -v pipx >/dev/null 2>&1; then
+    pipx ensurepath >/dev/null 2>&1 || true
+    export PATH="${HOME}/.local/bin:${PATH}"
+    if pipx install ollmcp >/dev/null 2>&1 || pipx upgrade ollmcp >/dev/null 2>&1; then
+      ok "ollmcp instalado (cliente MCP para modelos locales)"
+      warn "abre una terminal nueva, o corre 'exec \$SHELL', para que quede en el PATH"
+    else
+      warn "no se pudo instalar ollmcp; intenta: pipx install ollmcp"
+    fi
   else
-    warn "no se pudo instalar ollmcp; instalalo con: pip install --user ollmcp"
+    warn "pipx no disponible; instalalo con: sudo apt install pipx"
   fi
 fi
 
@@ -170,8 +182,12 @@ fi
 # 5. Dependencia opcional del honeypot
 # ---------------------------------------------------------------------------
 info "Dependencia opcional (honeypot Triconex)"
-if pip3 install --user --quiet crcmod 2>/dev/null; then
-  ok "crcmod instalado — triconex_honeypot.py disponible"
+# crcmod es una libreria, no una aplicacion: pipx no aplica. En Ubuntu 24.04
+# viene empaquetada, que es la via limpia bajo PEP 668.
+if sudo apt-get install -y -qq python3-crcmod 2>/dev/null; then
+  ok "crcmod instalado desde el repositorio del sistema"
+elif pip3 install --user --quiet --break-system-packages crcmod 2>/dev/null; then
+  ok "crcmod instalado con pip"
 else
   warn "no se pudo instalar crcmod; el honeypot no funcionara (opcional)"
 fi

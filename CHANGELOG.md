@@ -2,6 +2,25 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.10.2] — 2026-09-10
+
+### Corregido
+- **`pip install --user` fallaba en Ubuntu 24.04.** Desde esa versión rige
+  PEP 668: el Python del sistema lo gestiona apt y pip se rechaza con
+  `externally-managed-environment`. El bootstrap y la documentación usaban ese
+  comando en cinco lugares, así que la instalación del cliente MCP fallaba en
+  la plataforma que el propio repositorio recomienda
+- `ollmcp` se instala ahora con **pipx**, que además es la vía correcta para una
+  aplicación de línea de comandos: entorno aislado y binario en el PATH
+- `crcmod` se toma del repositorio del sistema (`python3-crcmod`), con
+  `--break-system-packages` como último recurso — es una librería, no una
+  aplicación, así que pipx no aplica
+- `pipx` agregado a los paquetes base
+- Nueva trampa documentada en `setup/SETUP.md`
+
+> Encontrado al provisionar la VM por primera vez. Es el tipo de falla que sólo
+> aparece corriendo el procedimiento completo en la plataforma real.
+
 ## [0.10.1] — 2026-09-09
 
 ### Cambiado

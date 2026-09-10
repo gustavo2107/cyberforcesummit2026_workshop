@@ -179,8 +179,12 @@ du -sh ~/.ollama/models
 **El cliente MCP:**
 
 ```bash
-pip install --user --upgrade ollmcp
+sudo apt install -y pipx
+pipx install ollmcp
 ```
+
+> Con `pipx`, no con `pip`: desde Ubuntu 24.04 rige PEP 668 y
+> `pip install --user` falla con `externally-managed-environment`.
 
 > **Ventaja operativa:** una vez descargado, el laboratorio **no necesita
 > internet en absoluto.** Ni cuentas, ni tokens, ni que el venue deje pasar el
@@ -200,7 +204,9 @@ brew install gitleaks     # macOS
 Sólo lo necesita quien vaya a commitear al repositorio. El hook de pre-commit
 funciona sin él, con comprobaciones básicas.
 
-**crcmod** — `pip install --user crcmod`. Sólo para `triconex_honeypot.py`.
+**crcmod** — `sudo apt install python3-crcmod`. Sólo para `triconex_honeypot.py`.
+Es una librería, no una aplicación, así que `pipx` no aplica: se toma del
+repositorio del sistema.
 
 **Docker** — únicamente si usas la ruta alternativa de `setup/docker-compose.yml`
 en lugar de la VM.

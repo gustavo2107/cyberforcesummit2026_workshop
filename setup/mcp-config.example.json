@@ -1,28 +1,27 @@
 {
   "_comentario": [
-    "Configuracion del servidor MCP de tshark para el taller.",
+    "Configuracion del servidor MCP de tshark, con las opciones explicadas.",
     "",
-    "Copia este archivo a mcp-config.json y ajusta lo que haga falta:",
-    "    cp setup/mcp-config.example.json setup/mcp-config.json",
+    "IMPORTANTE: este archivo lleva claves de comentario (_comentario,",
+    "_alternativas, _verificacion) que un parser estricto puede rechazar.",
+    "Para pasarselo a ollmcp usa mcp-config.minimo.json, que solo tiene el",
+    "bloque mcpServers:",
     "",
-    "Abajo estan las tres opciones documentadas en docs/07-laboratorio-vm.md",
-    "seccion 7.5. Deja activa una sola y borra o comenta las demas.",
+    "    ollmcp -m triton-analista -j setup/mcp-config.minimo.json",
+    "",
+    "El flag es --servers-json (-j). NO --mcp-server: ese espera la ruta a un",
+    "script .py o .js, no el nombre de un binario.",
     "",
     "CRITICO: el proceso NO debe correr como root. tshark deshabilita los",
-    "scripts Lua para superusuario y el disector TriStation no cargara. El",
-    "sintoma es silencioso: el asistente vera 'UDP' en lugar de TRISTATION y",
-    "va a inventar para llenar el hueco."
+    "scripts Lua para superusuario y el disector TriStation no cargara."
   ],
-
   "mcpServers": {
     "tshark": {
       "command": "mcp-wireshark"
     }
   },
-
   "_alternativas": {
     "_nota": "Reemplaza el bloque mcpServers de arriba por alguno de estos.",
-
     "wireshark-mcp": {
       "mcpServers": {
         "tshark": {
@@ -30,17 +29,17 @@
         }
       }
     },
-
     "WireMCP (Node)": {
       "mcpServers": {
         "tshark": {
           "command": "node",
-          "args": ["/home/analista/WireMCP/index.js"]
+          "args": [
+            "/home/analista/WireMCP/index.js"
+          ]
         }
       }
     }
   },
-
   "_verificacion": [
     "Antes del taller, con el cliente arriba, pidele al asistente:",
     "  'Corre: tshark -r malware_exec.pcap -c 1 y dime el protocolo'",

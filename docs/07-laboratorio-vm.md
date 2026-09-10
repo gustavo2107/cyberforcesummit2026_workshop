@@ -311,17 +311,26 @@ La configuración va en formato MCP estándar. Toma
 }
 ```
 
-Y arrancas el cliente apuntando a esa configuración:
+Y arrancas el cliente apuntando a ese archivo:
 
 ```bash
 cd ~/taller
-ollmcp --model triton-analista --mcp-server ~/taller/setup/mcp-config.json
+ollmcp --model triton-analista --servers-json setup/mcp-config.minimo.json
 ```
 
-> **Confirma la sintaxis exacta con `ollmcp --help`.** Acepta servidores por
-> línea de comandos y por archivo JSON, pero el nombre del parámetro puede
-> variar entre versiones. Esta parte no está verificada: es el eslabón que
-> tienes que validar tú.
+En corto: `ollmcp -m triton-analista -j setup/mcp-config.minimo.json`
+
+> **El flag es `--servers-json`, no `--mcp-server`.** Es el error fácil de
+> cometer: `--mcp-server` existe, pero espera **la ruta a un script `.py` o
+> `.js`**, no el nombre de un binario. Si le pasas `mcp-wireshark` responde
+> `Server script not found`. Para un servidor instalado como binario en el PATH,
+> la vía es el archivo JSON.
+>
+> Usa `mcp-config.minimo.json` y no `mcp-config.example.json`: el de ejemplo
+> lleva comentarios dentro del JSON para explicar las opciones, y un parser
+> estricto los rechaza.
+
+**Verificado** con `ollmcp` sobre Ubuntu 24.04, septiembre 2026.
 
 ### 7.6 La validación
 

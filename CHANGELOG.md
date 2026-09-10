@@ -2,6 +2,18 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.11.2] — 2026-09-10
+
+### Corregido y verificado
+- **El flag de `ollmcp` para apuntar al servidor es `--servers-json` (`-j`)**,
+  no `--mcp-server`. Estaba marcado como no verificado y resultó equivocado:
+  `--mcp-server` existe, pero espera la ruta a un script `.py` o `.js`, no el
+  nombre de un binario, y responde `Server script not found`
+- Para un servidor instalado como binario en el PATH —como `mcp-wireshark`— la
+  vía es el archivo JSON
+- Documentado que hay que usar `mcp-config.minimo.json` y no el de ejemplo: éste
+  lleva comentarios dentro del JSON que un parser estricto rechaza
+
 ## [0.11.1] — 2026-09-10
 
 ### Verificado

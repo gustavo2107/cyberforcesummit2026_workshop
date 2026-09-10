@@ -79,11 +79,12 @@ ollama run triton-analista "responde solo: listo" --verbose
 
 ```bash
 cd ~/taller
-ollmcp --model triton-analista --mcp-server <config-del-servidor-tshark>
+ollmcp --model triton-analista --servers-json setup/mcp-config.minimo.json
 ```
 
-Los parámetros exactos dependen del servidor MCP que hayas fijado. Toma
-`setup/mcp-config.example.json` como base y usa rutas absolutas.
+El flag es **`--servers-json`** (o `-j`). No `--mcp-server`: ése espera la ruta
+a un script `.py` o `.js`, no el nombre de un binario, y responde
+`Server script not found` si le pasas uno.
 
 ### 3.3 La pregunta de control
 

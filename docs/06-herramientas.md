@@ -125,12 +125,12 @@ consume.
 
 Opciones probadas por la comunidad, en orden de simplicidad de arranque:
 
-| Proyecto | Nota |
-|---|---|
-| [`0xKoda/WireMCP`](https://github.com/0xKoda/WireMCP) | Enfocado en análisis de tráfico para LLMs |
-| [`bx33661/Wireshark-MCP`](https://github.com/bx33661/Wireshark-MCP) | Respuestas respaldadas por datos reales de tshark |
-| [`khuynh22/mcp-wireshark`](https://github.com/khuynh22/mcp-wireshark) | Instalable con pip, multiplataforma |
-| [`tuliperis/SharkMCP`](https://github.com/tuliperis/SharkMCP) | Captura y análisis |
+| Proyecto | Instalación | Nota |
+|---|---|---|
+| [`khuynh22/mcp-wireshark`](https://github.com/khuynh22/mcp-wireshark) | `pipx install mcp-wireshark` | Python 3.10+. Binario en el PATH. **El más simple** |
+| [`bx33661/Wireshark-MCP`](https://github.com/bx33661/Wireshark-MCP) | `pipx install wireshark-mcp` | Python 3.10+. Autoconfigura clientes detectados |
+| [`0xKoda/WireMCP`](https://github.com/0xKoda/WireMCP) | `git clone` + `npm install` | Node 16+. Se lanza con `node index.js` |
+| [`tuliperis/SharkMCP`](https://github.com/tuliperis/SharkMCP) | ver repositorio | Captura y análisis |
 
 **Criterio de elección:** que invoque el `tshark` del sistema en lugar de traer
 su propio parser. Así hereda el disector automáticamente, sin escribir código.

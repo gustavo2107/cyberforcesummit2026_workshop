@@ -1,31 +1,52 @@
 {
   "_comentario": [
-    "Ejemplo de configuracion de un MCP de tshark para el taller.",
-    "Ajusta 'command' y 'args' segun el MCP que hayas elegido:",
-    "  0xKoda/WireMCP  ·  bx33661/Wireshark-MCP",
-    "  khuynh22/mcp-wireshark  ·  tuliperis/SharkMCP",
+    "Configuracion del servidor MCP de tshark para el taller.",
+    "",
+    "Copia este archivo a mcp-config.json y ajusta lo que haga falta:",
+    "    cp setup/mcp-config.example.json setup/mcp-config.json",
+    "",
+    "Abajo estan las tres opciones documentadas en docs/07-laboratorio-vm.md",
+    "seccion 7.5. Deja activa una sola y borra o comenta las demas.",
     "",
     "CRITICO: el proceso NO debe correr como root. tshark deshabilita los",
-    "scripts Lua para superusuario y el disector TriStation no cargara.",
-    "El sintoma es que el asistente vera 'UDP' y payload 'data' en lugar",
-    "de TRISTATION, y va a inventar para llenar el hueco."
+    "scripts Lua para superusuario y el disector TriStation no cargara. El",
+    "sintoma es silencioso: el asistente vera 'UDP' en lugar de TRISTATION y",
+    "va a inventar para llenar el hueco."
   ],
 
   "mcpServers": {
     "tshark": {
-      "command": "npx",
-      "args": ["-y", "<paquete-del-mcp-elegido>"],
-      "env": {
-        "PCAP_DIR": "/ruta/absoluta/al/repo/evidence/tricotools",
-        "WIRESHARK_PLUGIN_DIR": "/home/<usuario>/.local/lib/wireshark/plugins"
+      "command": "mcp-wireshark"
+    }
+  },
+
+  "_alternativas": {
+    "_nota": "Reemplaza el bloque mcpServers de arriba por alguno de estos.",
+
+    "wireshark-mcp": {
+      "mcpServers": {
+        "tshark": {
+          "command": "wireshark-mcp"
+        }
+      }
+    },
+
+    "WireMCP (Node)": {
+      "mcpServers": {
+        "tshark": {
+          "command": "node",
+          "args": ["/home/analista/WireMCP/index.js"]
+        }
       }
     }
   },
 
   "_verificacion": [
-    "Antes del taller, pidele al asistente:",
+    "Antes del taller, con el cliente arriba, pidele al asistente:",
     "  'Corre: tshark -r malware_exec.pcap -c 1 y dime el protocolo'",
-    "Debe responder TRISTATION. Si responde UDP, el disector no cargo",
-    "y el taller no funciona: revisa setup/SETUP.md."
+    "",
+    "Debe responder TRISTATION *y* debes ver la llamada a la herramienta.",
+    "  - Responde UDP        -> el disector no cargo. Ver setup/SETUP.md",
+    "  - Responde sin llamar -> el modelo esta inventando. Cambialo."
   ]
 }

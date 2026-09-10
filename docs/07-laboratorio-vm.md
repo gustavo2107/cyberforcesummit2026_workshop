@@ -251,18 +251,66 @@ confirmación humana. Requiere Python 3.11 o superior.
 
 ### 7.5 El servidor MCP de tshark
 
-Elige uno de los de `06-herramientas.md` y **fíjalo con semanas de antelación.**
-No cambies de servidor MCP la semana del evento.
+Es la pieza que le da a `ollmcp` acceso a `tshark`. Hay varios proyectos y
+cualquiera sirve mientras cumpla el criterio: **que invoque el `tshark` del
+sistema en lugar de traer su propio parser**, para que herede el disector sin
+escribir código.
+
+| Proyecto | Cómo se instala | Notas |
+|---|---|---|
+| **`mcp-wireshark`** ([khuynh22](https://github.com/khuynh22/mcp-wireshark)) | `pipx install mcp-wireshark` | Python 3.10+. Deja el binario `mcp-wireshark` en el PATH. **El más simple.** |
+| **`wireshark-mcp`** ([bx33661](https://github.com/bx33661/Wireshark-MCP)) | `pipx install wireshark-mcp` | Python 3.10+. Trae `wireshark-mcp install`, que autoconfigura clientes detectados |
+| **`WireMCP`** ([0xKoda](https://github.com/0xKoda/WireMCP)) | `git clone` + `npm install` | Node 16+. Se lanza con `node /ruta/WireMCP/index.js` |
+
+**Fíjalo con semanas de antelación.** No cambies de servidor MCP la semana del
+evento.
+
+#### Ejemplo completo, con el más simple
 
 ```bash
-# ejemplo, si el que elegiste se distribuye por npm
-npm install -g <paquete-del-mcp-elegido>
+pipx install mcp-wireshark
+which mcp-wireshark          # confirma que quedó en el PATH
 ```
 
-El criterio de elección no cambia: que invoque el `tshark` del sistema en lugar
-de traer su propio parser, para que herede el disector sin escribir código.
-Configúralo tomando `setup/mcp-config.example.json` como base, con rutas
-absolutas.
+Si eliges uno de Node en su lugar:
+
+```bash
+cd ~
+git clone https://github.com/0xKoda/WireMCP.git
+cd WireMCP && npm install
+# se lanza con: node ~/WireMCP/index.js
+```
+
+> Los dos primeros se instalan con **`pipx`, no con `pip`** — misma razón que
+> `ollmcp`: PEP 668 en Ubuntu 24.04. Y son aplicaciones de línea de comandos,
+> que es justo para lo que `pipx` existe.
+
+#### Conectarlo con el modelo
+
+La configuración va en formato MCP estándar. Toma
+`setup/mcp-config.example.json` como base y ajusta las rutas absolutas:
+
+```json
+{
+  "mcpServers": {
+    "tshark": {
+      "command": "mcp-wireshark"
+    }
+  }
+}
+```
+
+Y arrancas el cliente apuntando a esa configuración:
+
+```bash
+cd ~/taller
+ollmcp --model triton-analista --mcp-server ~/taller/setup/mcp-config.json
+```
+
+> **Confirma la sintaxis exacta con `ollmcp --help`.** Acepta servidores por
+> línea de comandos y por archivo JSON, pero el nombre del parámetro puede
+> variar entre versiones. Esta parte no está verificada: es el eslabón que
+> tienes que validar tú.
 
 ### 7.6 La validación
 

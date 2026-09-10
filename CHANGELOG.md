@@ -2,6 +2,25 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.11.0] — 2026-09-10
+
+### Cambiado
+- `docs/07` §7.5 pasa de un marcador `<paquete-del-mcp-elegido>` a los
+  **comandos reales de los tres servidores MCP**, tomados de sus repositorios:
+  `pipx install mcp-wireshark`, `pipx install wireshark-mcp`, y el `git clone` +
+  `npm install` de WireMCP. Con un ejemplo completo de punta a punta usando el
+  más simple
+- `setup/mcp-config.example.json` trae ahora una configuración funcional para
+  `mcp-wireshark` y las dos alternativas listas para intercambiar, en lugar de
+  marcadores de posición
+- La tabla de `docs/06` incluye la columna de instalación
+
+### Nota
+- Los dos servidores en Python se instalan con `pipx` por la misma razón que
+  `ollmcp`: PEP 668, y son aplicaciones de línea de comandos
+- La sintaxis exacta del parámetro de `ollmcp` para apuntar al servidor queda
+  marcada como "confirmar con `ollmcp --help`": no está verificada
+
 ## [0.10.3] — 2026-09-10
 
 ### Corregido

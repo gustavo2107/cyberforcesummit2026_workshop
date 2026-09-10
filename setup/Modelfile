@@ -3,7 +3,15 @@
 # Construye una variante afinada del modelo base para trabajo forense.
 #
 #     ollama create triton-analista -f setup/Modelfile
-#     ollmcp --model triton-analista --mcp-server <tu-config>
+#     ollmcp -m triton-analista -j setup/mcp-config.minimo.json
+#
+# El flag es --servers-json (-j). NO --mcp-server: ese espera la ruta a un
+# script .py o .js y responde "Server script not found".
+#
+# Construir la variante NO basta: ollmcp lleva su propia configuracion de
+# modelo y puede arrancar sin enviar estos parametros --se ven como "-" en el
+# panel /mc--, con lo que este afinado se queda en el papel. Hay que fijarlos
+# dentro del cliente y guardarlos con /sc. Ver docs/07, seccion 7.5.1.
 #
 # NO altera el disector, la evidencia ni la deteccion de TRITON. Todo lo que
 # hace es configurar al analista: los valores por omision de Ollama estan

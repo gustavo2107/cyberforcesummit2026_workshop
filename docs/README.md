@@ -64,4 +64,6 @@ taller pierda la mitad de su valor.
 09-mapeo-attack        Mapeo a MITRE ATT&CK for ICS.
 10-ejecucion           Cómo correr una sesión. Plan B sin IA.
 11-descargas           Inventario de descargas y paquete offline.
+guia-secuencia-lab.pdf   Guía imprimible: del clonado al taller listo.
+guia-secuencia-lab.html  Fuente de la guía, para regenerar el PDF.
 ```

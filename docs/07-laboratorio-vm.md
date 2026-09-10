@@ -225,10 +225,18 @@ al analista.
 ### 7.4 El cliente MCP
 
 ```bash
+sudo apt install -y pipx     # si seguiste el paso 3, ya lo tienes
 pipx install ollmcp
 pipx ensurepath
-exec $SHELL          # recarga el PATH
-ollmcp --help        # confirma
+exec $SHELL                  # recarga el PATH — sin esto, "command not found"
+ollmcp --help                # confirma
+```
+
+Si después del `exec $SHELL` sigue sin encontrarse, confirma que sí quedó
+instalado llamándolo por su ruta:
+
+```bash
+~/.local/bin/ollmcp --help
 ```
 
 `ollmcp` es el puente: conecta el modelo de Ollama con los servidores MCP por

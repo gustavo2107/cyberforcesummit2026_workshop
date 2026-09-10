@@ -102,10 +102,21 @@ Desde Ubuntu 24.04 rige PEP 668: el Python del sistema lo gestiona apt, y
 pip install --user ollmcp        # error: externally-managed-environment
 
 # bien: pipx, que ademas es la via correcta para una aplicacion de CLI
-sudo apt install -y pipx
+sudo apt install -y pipx         # pipx NO viene instalado por omision
 pipx install ollmcp
-pipx ensurepath && exec $SHELL   # para que quede en el PATH
+pipx ensurepath
+exec $SHELL                      # sin esto, 'ollmcp: command not found'
 ```
+
+Dos tropiezos seguidos en esta secuencia, y conviene conocerlos:
+
+- **`pipx: command not found`** — no viene instalado en Ubuntu por omisión. Es
+  la primera línea del bloque de arriba.
+- **`ollmcp: command not found` después de instalarlo** — `pipx` lo deja en
+  `~/.local/bin`, que no está en el PATH de la sesión en curso.
+  `pipx ensurepath` lo agrega, pero sólo surte efecto en una terminal nueva o
+  tras `exec $SHELL`. Para confirmar que sí se instaló:
+  `~/.local/bin/ollmcp --help`.
 
 Para **librerías** (no aplicaciones), como `crcmod`, `pipx` no aplica: se toman
 del repositorio del sistema con `sudo apt install python3-crcmod`, o en último

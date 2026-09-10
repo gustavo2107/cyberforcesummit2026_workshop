@@ -2,6 +2,22 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.10.3] — 2026-09-10
+
+### Corregido
+- `docs/07`, paso 7.4: el bloque de instalación de `ollmcp` no incluía
+  `sudo apt install -y pipx`. Quien saltara directo a esa sección se topaba con
+  `pipx: command not found` — el mismo tropiezo que la corrección anterior
+  pretendía evitar. El bloque es ahora autocontenido
+- Documentado el segundo tropiezo de la misma secuencia: tras instalarlo,
+  `ollmcp` queda en `~/.local/bin` y no aparece hasta `exec $SHELL`. Con la
+  comprobación por ruta directa para distinguir "no se instaló" de "no está en
+  el PATH"
+- `setup/SETUP.md` amplía la trampa de PEP 668 con ambos casos
+
+> Las dos correcciones salieron de aprovisionar la VM de verdad. Ninguna se
+> habría encontrado leyendo la documentación.
+
 ## [0.10.2] — 2026-09-10
 
 ### Corregido

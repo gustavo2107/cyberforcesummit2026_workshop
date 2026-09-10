@@ -2,6 +2,66 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.14.0] — 2026-09-10
+
+`docs/10-ejecucion.md` se reescribe con el guion completo de la sesion. Era el
+documento mas desactualizado del repositorio: seguia mostrando cinco lineas de
+`verify-setup.sh` cuando ya son ocho, y su pregunta de control le pedia al
+modelo un `tshark -r malware_exec.pcap` que el modelo no ejecuta —llama
+herramientas MCP, con ruta absoluta.
+
+### Agregado — seccion 4, las nueve herramientas
+
+Tabla de las 9 habilitadas con que hace cada una y **su equivalente en
+`tshark`**, para que el instructor pueda traducir en voz alta lo que ve en
+pantalla. Mas los tres parametros que cambian todo:
+
+- `display_filter` — filtra **antes** de devolver. Sin el llegan 896 lineas
+- `custom_columns` — convierte la linea de tiempo en **una sola llamada**
+- `limit` / `offset` — por omision 20 en `get_packet_list`, 100 en
+  `extract_fields`. Es la trampa que produjo el `[Showing 100/897 lines]` del
+  que el modelo generalizo
+
+### Agregado — seccion 5, el guion consulta por consulta
+
+Doce consultas en orden. Cada una trae:
+
+- **el texto que se pega**, con la ruta absoluta
+- **que herramienta debe llamar** el modelo
+- **que debe salir** — la verdad de referencia
+- **el comando `tshark` con el que el instructor lo comprueba** mientras circula
+
+Incluye la consulta que ensenia la tecnica —filtro mas columnas para la linea de
+tiempo— y la consulta 12, donde el modelo traduce *key* como "tecla" y el taller
+se cierra solo.
+
+### Cambiado — la pregunta de control (paso 3.3)
+
+Pasa a ser una sola consulta que valida **tres cosas a la vez**: que aparezca
+`tristation` entre los protocolos, que sean 896 tramas, y que el SHA-256 cuadre
+con la huella del repositorio. Cadena de custodia y disector en un solo turno.
+
+### Agregado — los comandos del cliente
+
+Tabla de `/mc`, `/sc`, `/t`, `/cc`, `/m`, `/h`, `/q`. Con la advertencia sobre
+`/cc`: borra el contexto acumulado, y el laboratorio depende de que el modelo
+recuerde lo que ya midio.
+
+### Reescrito — `prompts/01-baseline.md`
+
+- Ruta absoluta en todos los prompts
+- Nueva seccion "Como pedir bien", con las tres tecnicas que ahorran consultas
+- **Las tres preguntas de control** que el participante se hace a si mismo:
+  de que comando salio, de que columna salio, y si es propiedad del trafico o
+  del decodificador
+- Un prompt prohibido mas: "corre un analisis de seguridad completo", que
+  dispara la deteccion automatica
+
+### Cambiado — Plan B con explicaciones
+
+Cada bloque de `tshark` lleva ahora que hace cada comando, y se agrega una tabla
+de las seis banderas con las que se hace todo el laboratorio.
+
 ## [0.13.0] — 2026-09-10
 
 Segunda corrida completa en la VM, esta vez recorriendo el flujo del workbook.

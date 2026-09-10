@@ -367,18 +367,48 @@ pipx ensurepath
 exec $SHELL                  # sin esto: "ollmcp: command not found"
 
 cd ~/taller
-ollmcp -m triton-analista -j setup/mcp-config.minimo.json</code></pre>
+mkdir -p ~/.config/ollmcp
+cp setup/ollmcp-config.json ~/.config/ollmcp/config.json
+ollmcp -j setup/mcp-config.minimo.json</code></pre>
 
 <div class="alerta">
-  <b>Dos trampas en una sola línea</b>
+  <b>Tres trampas en una sola línea</b>
   <b>El flag es <code>--servers-json</code> (<code>-j</code>)</b>, no
   <code>--mcp-server</code>: ése existe, pero espera la ruta a un script
   <code>.py</code> o <code>.js</code>, y con el nombre de un binario responde
   <code>Server script not found</code>.<br>
-  <b>Y el servidor es <code>wireshark-mcp</code>, no <code>mcp-wireshark</code>.</b>
+  <b>El servidor es <code>wireshark-mcp</code>, no <code>mcp-wireshark</code>.</b>
   El segundo instala limpio y no arranca: revienta con
-  <code>AttributeError: 'Server' object has no attribute 'list_tools'</code>, por
-  incompatibilidad con el SDK actual de MCP. No hay flag que lo arregle.
+  <code>AttributeError: 'Server' object has no attribute 'list_tools'</code>.<br>
+  <b>Y no pases <code>-m</code>.</b> Ver el recuadro siguiente — es la peor de las tres.
+</div>
+
+<div class="alerta">
+  <b>La trampa del <code>-m</code>: arranca el modelo equivocado en silencio</b>
+  <code>ollama</code> etiqueta el modelo como <code>triton-analista<b>:latest</b></code>
+  y <code>ollmcp</code> compara la cadena completa. Con
+  <code>-m triton-analista</code> no encuentra coincidencia, avisa en <b>una sola
+  línea</b> y arranca con el modelo base:
+  <div class="salida">Requested model triton-analista is not available — using qwen3.5:4b instead.</div>
+  El laboratorio corre igual: las herramientas funcionan, el disector se hereda,
+  las respuestas se ven bien. Lo que se perdió es el <code>SYSTEM</code> del
+  <code>Modelfile</code> — sin reglas de anclaje, sin etiquetas, sin "una
+  herramienta a la vez". Es decir, <b>exactamente lo que el taller mide</b>.<br><br>
+  El <code>config.json</code> ya trae el modelo, así que lo seguro es
+  <b>omitir el flag</b>. Y antes de cada sesión, mira el prompt del cliente: debe
+  decir <code>triton-analista/…</code>, no <code>qwen3.5/…</code>.
+</div>
+
+<div class="nota">
+  <b>Qué trae <code>ollmcp-config.json</code></b>
+  Los parámetros verificados y, sobre todo, la <b>curaduría de herramientas: 9
+  habilitadas de 52</b>. Las 43 apagadas incluyen toda la detección automática del
+  servidor —<code>detect_beaconing</code>, <code>detect_port_scan</code>,
+  <code>extract_credentials</code>, <code>yara_scan</code>— que sobre esta captura
+  no produce hallazgos: produce ruido plausible. El propio servidor recomienda
+  tres de ellas al abrir el archivo, y un modelo pequeño sigue recomendaciones.
+  La curaduría es lo que impide que el taller se vuelva una cacería de falsos
+  positivos.
 </div>
 
 <div class="nota">
@@ -528,53 +558,168 @@ completo tú mismo, con cronómetro, como si fueras participante — sin abrir l
 <p>Después contrasta contra <code>docs/03-rubrica.md</code>. Lo que se te dificultó a ti se le
 va a dificultar a la sala, y ahí es donde ajustas las pistas.</p>
 
-<h3>Lo que te va a pasar en el ensayo — y es la mejor parte del taller</h3>
+<h3>Los tres modos de falla — verificados, y reproducibles</h3>
 
-<p>En la verificación de este laboratorio, al pedirle el resumen de <i>expert info</i>,
-la herramienta devolvió esto:</p>
+<p>Todo lo que sigue pasó de verdad en el ensayo, con el modelo afinado, el disector
+cargado y <code>seed 42</code>. Si corres las mismas consultas, sale lo mismo. La
+tesis, en una frase:</p>
 
-<div class="salida">Errors (3)
-  1  Undecoded  TRISTATION  Lua Error: TriStation.lua:611: negative length in tvb range
-  2  Malformed  TRISTATION  TRITON malware detected!
-
-Notes (2)
-  2  Protocol   Ethertype   Didn't find padding of zeros...</div>
-
-<p>El modelo produjo, a partir de ahí, <b>un hallazgo crítico correcto envuelto en dos
-sobreinterpretaciones perfectamente plausibles</b>:</p>
+<div class="nota">
+  <b>El modelo extrae bien y explica mal.</b>
+  Lo que saca del comando suele ser correcto; lo que dice que <i>significa</i> es
+  donde inventa. Y las dos cosas llegan en el mismo párrafo, con el mismo tono de
+  seguridad.
+</div>
 
 <table>
-  <tr><th style="width:30%">Lo que leyó</th><th style="width:32%">Lo que concluyó</th><th>Qué es en realidad</th></tr>
+  <tr><th style="width:8%"></th><th style="width:46%">Qué pasa</th><th>Cómo se detecta</th></tr>
+  <tr><td><b>A</b></td><td>Un artefacto de la <b>herramienta</b> leído como propiedad del <b>tráfico</b></td><td>¿Esto lo produjo la red, o el decodificador?</td></tr>
+  <tr><td><b>B</b></td><td>Una <b>columna mal leída</b> convertida en dato duro</td><td>Vuelve a la salida cruda y busca el número</td></tr>
+  <tr><td><b>C</b></td><td>Una <b>etiqueta mal puesta</b> — <code>[EVIDENCIA]</code> sobre lo inventado</td><td>Pide el comando que lo respalda</td></tr>
+</table>
+
+<h3>Familia A — el artefacto de la herramienta</h3>
+
+<p>Al pedir el resumen de <i>expert info</i>, la herramienta devuelve:</p>
+
+<div class="salida">Errors (3)
+   Frequency      Group           Protocol  Summary
+           1  Undecoded         TRISTATION  Lua Error: .../TriStation.lua:611: negative length in tvb range
+           2  Malformed         TRISTATION  TRITON malware detected!
+
+Notes (2)
+   Frequency      Group           Protocol  Summary
+           2  Protocol          Ethertype  Didn't find padding of zeros, and an undecoded trailer exists.</div>
+
+<p>Y al pedir la jerarquía de protocolos:</p>
+
+<div class="salida">udp                    frames:896
+  _ws.lua.fake         frames:896
+    tristation         frames:896
+      ts.crc16         frames:895
+      text             frames:1</div>
+
+<table>
+  <tr><th style="width:28%">Lo que leyó</th><th style="width:32%">Lo que concluyó</th><th>Qué es en realidad</th></tr>
   <tr>
     <td><code>TRITON malware detected!</code></td>
-    <td>Dos tramas con firma de TRITON</td>
+    <td>Tramas con firma de TRITON</td>
     <td><b>Correcto.</b> Es el hallazgo, y viene del disector</td>
   </tr>
   <tr>
     <td><code>Lua Error: TriStation.lua:611</code></td>
-    <td>"Paquetes corruptos en la captura"</td>
-    <td>Un <b>bug del disector</b>, de 2018. Dispara una vez, siempre la misma trama</td>
+    <td>"Corrupción o manipulación del protocolo"</td>
+    <td>Un <b>bug del disector</b>, de 2018. Dispara una vez, siempre la misma trama. <code>Undecoded</code> es "no pude leerlo", no "está dañado"</td>
   </tr>
   <tr>
     <td><code>Didn't find padding of zeros</code></td>
-    <td>Posible "manipulación del paquete"</td>
+    <td>Posible "modificación maliciosa del paquete"</td>
     <td>Aviso normal de Wireshark sobre el relleno de la trama Ethernet</td>
+  </tr>
+  <tr>
+    <td><code>_ws.lua.fake</code></td>
+    <td>Posible <b>"inyección de código"</b></td>
+    <td>La capa puente que Wireshark inserta para un disector escrito en Lua. La creó <code>TriStation.lua</code></td>
   </tr>
 </table>
 
 <div class="alerta">
-  <b>Las reglas de anclaje no atrapan esto</b>
-  El modelo etiquetó las tres afirmaciones como <code>[EVIDENCIA]</code> — y en su
-  lógica lo eran: salieron de ejecutar un comando y citan literalmente lo que la
-  herramienta imprimió. Lo que falta es el paso siguiente, y hay que enseñarlo
-  explícito: <b>¿esto es una propiedad del tráfico, o del decodificador que lo está
-  leyendo?</b> Ésa es la pregunta que cierra el taller. Está desarrollada en
-  <code>docs/03-rubrica.md</code>, y ya es criterio de calificación con peso alto.
+  <b>El argumento que mata a los tres de un golpe</b>
+  <code>_ws.lua.fake</code> aparece en <b>896 de 896 tramas</b>. Si fuera inyección,
+  estaría también en las 676 tramas de <i>polling</i> benigno. Un indicador presente
+  en el 100% de una captura no distingue nada — y un hallazgo que no separa señal de
+  ruido no es un hallazgo: es el instrumento.
 </div>
 
-<p>Puedes dejar que le pase a algún equipo y recogerlo en la revelación, o proyectar
-el bloque de arriba y pedirle a la sala que diga qué concluiría. Funciona igual de
-bien, y no depende de que alguien pregunte lo correcto.</p>
+<p><b>Y dos números que el modelo no comentó:</b> <code>ts.crc16</code> en 895 y
+<code>text</code> en 1. Una trama de 896 no tiene CRC y trae una capa de texto — casi
+con seguridad la misma que dispara el error de Lua. Excelente pista para el Bloque 2,
+visible a simple vista, y ningún equipo la mira.</p>
+
+<h3>Familia B — la columna mal leída</h3>
+
+<p>De esa misma salida, el modelo escribió:</p>
+
+<div class="salida">[EVIDENCIA] Error 2 (Malformed, TRISTATION): "TRITON malware detected!" (frame 2)</div>
+
+<div class="alerta">
+  <b>Las tramas son la 75 y la 887</b>
+  La columna que leyó dice <code>Frequency</code>: es <i>cuántas veces</i> ocurre, no
+  <i>dónde</i>. Se comprueba en un comando — <code>make triton</code>. Un número de
+  trama <b>inventado</b>, con etiqueta de evidencia, dentro de un reporte por lo demás
+  correcto. <b>Si sólo puedes mostrar un ejemplo en toda la sesión, muestra éste.</b>
+</div>
+
+<p>Regla operativa: el resumen de <i>expert info</i> da <b>frecuencias, no números de
+trama</b>. Para saber <i>dónde</i>, hace falta otra consulta.</p>
+
+<h3>Familia C — la etiqueta mal puesta</h3>
+
+<p>En la misma respuesta, el modelo etiquetó:</p>
+
+<ul>
+  <li><code>[CONOCIMIENTO] El disector ha detectado anomalías</code> — eso salió de un comando. Es <code>[EVIDENCIA]</code>.</li>
+  <li><code>[EVIDENCIA] ... (frame 2)</code> — eso no salió de ningún lado. Es invención.</li>
+</ul>
+
+<div class="nota">
+  <b>Etiquetó al revés — y ésa es la lección que cierra el taller</b>
+  Las etiquetas no <i>son</i> la verificación: son el sitio donde se aplica. Un reporte
+  con <code>[EVIDENCIA]</code> en todas partes no está anclado, está maquillado. Lo que
+  ancla es que puedas correr el comando y ver la trama.
+</div>
+
+<h3>El caso del <code>keyState</code> — extrae bien, interpreta mal</h3>
+
+<p>Es el más importante, porque ocurre justo sobre el hallazgo del taller. Pedido de
+extraer <code>ts.ts_cp_keyState</code>, el modelo acertó lo medible —<b><code>0x01</code>
+constante</b>— y después escribió:</p>
+
+<div class="salida">[CONOCIMIENTO] ts.ts_cp_keyState: Estado de la tecla (0x01 = presionada/activa)</div>
+
+<p>No es una tecla. Es la <b>llave física</b> del selector del Triconex, y <code>0x01</code>
+es la posición <b>PROGRAM</b>. Traducir <i>key</i> como <i>tecla</i> en vez de <i>llave</i>
+destruye el hallazgo entero: convierte el control que habría detenido el incidente en un
+detalle de teclado.</p>
+
+<p>Dos cosas que enseñar con esto:</p>
+
+<ol>
+  <li><b>La etiqueta funcionó.</b> El modelo marcó esa frase como <code>[CONOCIMIENTO]</code>
+  — "esto no lo verifiqué aquí". El sistema avisó bien, y aun así el analista se lo traga si
+  no lee las etiquetas.</li>
+  <li><b>El modelo no sabe TriStation, y no puede saberlo.</b> El disector le entrega el
+  campo; el significado lo pone el humano. Es la tesis del taller en una línea, demostrada
+  sobre el hallazgo central.</li>
+</ol>
+
+<p>Además generalizó desde datos truncados: la herramienta devolvió
+<code>[Showing 500/897 lines]</code> y el modelo afirmó "en todas las tramas" como
+<code>[EVIDENCIA]</code>. Nunca contó las 338. Es la familia B en su forma más común:
+<b>afirmar más de lo que el comando devolvió</b>.</p>
+
+<div class="nota">
+  <b>Nota práctica</b>
+  <code>extract_fields</code> devuelve una línea por trama, vacías incluidas: 896 líneas
+  de las que sólo 338 traen dato. Se desperdicia contexto y se invita a la generalización.
+  Enseña a filtrar antes de extraer.
+</div>
+
+<h3>El A/B que vale toda la sesión</h3>
+
+<p>Si tienes cinco minutos al cierre, corre la <b>misma</b> pregunta contra el modelo base
+y contra <code>triton-analista</code>. Sin el <code>SYSTEM</code>, la respuesta a "¿qué
+protocolo reporta la primera trama?" fue:</p>
+
+<div class="salida">El protocolo principal que reporta la primera trama es UDP</div>
+
+<p>…teniendo <code>"frame.protocols": "eth:ethertype:ip:udp:tristation"</code> en la mano.
+Enterró el hallazgo bajo el modelo OSI, añadió "el puerto 1502 es típicamente utilizado por
+el servicio Tris" —memoria de entrenamiento presentada como hecho, sin etiquetar— y encadenó
+tres herramientas sin leer entre una y otra.</p>
+
+<p>Misma evidencia, mismas 9 herramientas, mismo hardware. Lo único distinto son las reglas.
+Proyectadas lado a lado, nadie vuelve a preguntar para qué sirve el anclaje.</p>
 
 <h3>Graba el video de respaldo</h3>
 
@@ -593,6 +738,8 @@ taller como demo guiada en lugar de perderlo.</p>
   <li>Confirmar que las laptops de los participantes pueden asignar <b>8 GB</b> a la VM</li>
   <li>Validar la pregunta de control <b>el mismo día</b> — el modelo debe responder TRISTATION</li>
   <li>Revisar <code>/mc</code> el mismo día: ningún parámetro en <code>-</code></li>
+  <li><b>Confirmar que el prompt dice <code>triton-analista</code></b>, no <code>qwen3.5</code></li>
+  <li>Confirmar <code>9/52 tools enabled</code> en el arranque del cliente</li>
   <li>Tener a la mano el tiempo por consulta medido, para anunciarlo al abrir</li>
   <li>Preparar <b>dos mesas de rescate</b> con el entorno ya corriendo</li>
   <li>Probar la VM en una máquina <b>que no sea la tuya</b></li>
@@ -658,6 +805,21 @@ taller como demo guiada en lugar de perderlo.</p>
     <td>Anúncialo al abrir la sesión. Más vCPU y RAM lo bajan; una GPU, mucho más.</td>
   </tr>
   <tr>
+    <td>El prompt dice <code>qwen3.5/…</code></td>
+    <td>Pasaste <code>-m</code> con la etiqueta incompleta: corre el modelo <b>base</b>, sin reglas de anclaje</td>
+    <td>Salir y entrar <b>sin <code>-m</code></b>. Es la falla más silenciosa del lab</td>
+  </tr>
+  <tr>
+    <td>El modelo dice "(frame 2)" sobre <i>expert info</i></td>
+    <td>Leyó la columna <code>Frequency</code> como número de trama</td>
+    <td>No se arregla: <b>es material del taller.</b> Son la 75 y la 887</td>
+  </tr>
+  <tr>
+    <td>El modelo habla de "estado de la tecla"</td>
+    <td>Tradujo <i>key</i> como tecla, no como llave física</td>
+    <td>No se arregla: <b>es la tesis del taller.</b> Ver la sección 6</td>
+  </tr>
+  <tr>
     <td><code>Server script not found</code></td>
     <td>Usaste <code>--mcp-server</code>: espera un <code>.py</code> o <code>.js</code></td>
     <td><code>-j setup/mcp-config.minimo.json</code></td>
@@ -703,13 +865,14 @@ taller como demo guiada en lugar de perderlo.</p>
   <tr><td><code>make check-docs</code></td><td>Verifica que no falte documentación</td></tr>
   <tr><td><code>ollama list</code></td><td>Modelos descargados</td></tr>
   <tr><td><code>ollama ps</code></td><td>Si el modelo está cargado en memoria</td></tr>
-  <tr><td><code>ollmcp -m triton-analista -j setup/mcp-config.minimo.json</code></td><td>Arranca el cliente con el servidor MCP</td></tr>
+  <tr><td><code>ollmcp -j setup/mcp-config.minimo.json</code></td><td>Arranca el cliente. <b>Sin <code>-m</code></b></td></tr>
 </table>
 
 <h3>Dentro del cliente</h3>
 
 <table>
   <tr><th style="width:34%">Comando</th><th>Qué hace</th></tr>
+  <tr><td>El prompt del cliente</td><td>Debe decir <code>triton-analista/…</code>. Si dice <code>qwen3.5/…</code>, sal y entra sin <code>-m</code></td></tr>
   <tr><td><code>/mc</code></td><td>Panel de parámetros del modelo. <b>Ninguno debe decir <code>-</code></b></td></tr>
   <tr><td><code>/sc</code></td><td>Guarda la configuración en <code>~/.config/ollmcp/config.json</code></td></tr>
   <tr><td><code>/tools</code></td><td>Herramientas disponibles. La numeración cambia entre versiones</td></tr>
@@ -725,7 +888,8 @@ taller como demo guiada en lugar de perderlo.</p>
   <tr><td>Detecciones de TRITON</td><td>Tramas 75 y 887</td></tr>
   <tr><td>El detalle que casi nadie ve</td><td>Trama 891 <i>Run program</i> → trama 892 <b>Command rejected</b></td></tr>
   <tr><td>El hallazgo</td><td><code>keyState = 0x01 [Program]</code> constante en las 338 respuestas</td></tr>
-  <tr><td>Lo que <b>no</b> es del caso</td><td>El <code>Lua Error</code> de <code>TriStation.lua:611</code> y el aviso de <i>padding</i> de Ethernet: artefactos de la herramienta</td></tr>
+  <tr><td>Lo que <b>no</b> es del caso</td><td>El <code>Lua Error</code> de <code>TriStation.lua:611</code>, el aviso de <i>padding</i> de Ethernet y <code>_ws.lua.fake</code>: artefactos de la herramienta</td></tr>
+  <tr><td>Las dos asimetrías de la jerarquía</td><td><code>ts.crc16</code> en 895 y <code>text</code> en 1 — una trama sin CRC, con capa de texto</td></tr>
   <tr><td>La prueba de que el disector llegó al modelo</td><td><code>frame.protocols</code> termina en <code>:tristation</code></td></tr>
 </table>
 

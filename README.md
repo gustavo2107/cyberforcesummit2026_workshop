@@ -208,6 +208,8 @@ docs/
   09-mapeo-attack        Mapeo a MITRE ATT&CK for ICS v19.2
   10-ejecucion           Cómo correr una sesión, y el plan B sin IA
   11-descargas           Inventario de todo lo que hay que descargar
+  guia-secuencia-lab.pdf Guía imprimible: del clonado al taller listo
+  guia-secuencia-lab.html Fuente de la guía, para regenerar el PDF
 setup/
   SETUP.md               Instalación y trampas conocidas
   Modelfile              Afinado del modelo local para trabajo forense

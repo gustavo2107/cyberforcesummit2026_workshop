@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Guía de secuencia — Laboratorio TRITON</title>
+<style>
+  @page { size: letter; margin: 16mm 15mm 14mm 15mm; }
+
+  :root {
+    --tinta:    #1a2233;
+    --suave:    #5a6478;
+    --acento:   #14532d;
+    --acento-bg:#e8f2ec;
+    --alerta:   #991b1b;
+    --alerta-bg:#fdeaea;
+    --linea:    #d8dde5;
+    --code-bg:  #f4f6f9;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 9.6pt;
+    line-height: 1.5;
+    color: var(--tinta);
+    margin: 0;
+  }
+
+  /* ---------- Portada / encabezado ---------- */
+  .cabecera {
+    border-bottom: 2.5px solid var(--acento);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  .cabecera h1 {
+    font-size: 19pt;
+    margin: 0 0 2px 0;
+    letter-spacing: -0.3px;
+  }
+  .cabecera .sub {
+    font-size: 10.5pt;
+    color: var(--suave);
+    margin: 0 0 6px 0;
+  }
+  .cabecera .meta {
+    font-size: 8.2pt;
+    color: var(--suave);
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .cabecera .meta b { color: var(--tinta); font-weight: 600; }
+
+  /* ---------- Secciones ---------- */
+  h2 {
+    font-size: 11.5pt;
+    margin: 18px 0 7px 0;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--linea);
+    page-break-after: avoid;
+  }
+  h2 .num {
+    display: inline-block;
+    background: var(--acento);
+    color: #fff;
+    width: 19px; height: 19px;
+    line-height: 19px;
+    text-align: center;
+    border-radius: 3px;
+    font-size: 9.5pt;
+    margin-right: 7px;
+    vertical-align: 1px;
+  }
+  h2 .tiempo {
+    float: right;
+    font-size: 8pt;
+    font-weight: normal;
+    color: var(--suave);
+    padding-top: 3px;
+  }
+  h3 {
+    font-size: 9.8pt;
+    margin: 11px 0 4px 0;
+    color: var(--acento);
+    page-break-after: avoid;
+  }
+
+  p { margin: 5px 0; }
+  ul, ol { margin: 5px 0 5px 0; padding-left: 19px; }
+  li { margin: 2.5px 0; }
+
+  /* ---------- Código ---------- */
+  pre {
+    background: var(--code-bg);
+    border-left: 2.5px solid var(--acento);
+    padding: 7px 9px;
+    margin: 6px 0;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.4pt;
+    line-height: 1.42;
+    white-space: pre-wrap;
+    word-break: break-word;
+    page-break-inside: avoid;
+    border-radius: 0 2px 2px 0;
+  }
+  code {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.6pt;
+    background: var(--code-bg);
+    padding: 0.5px 3px;
+    border-radius: 2px;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  /* ---------- Avisos ---------- */
+  .alerta, .nota {
+    padding: 8px 11px;
+    margin: 9px 0;
+    page-break-inside: avoid;
+    border-radius: 2px;
+    font-size: 9.2pt;
+  }
+  .alerta {
+    background: var(--alerta-bg);
+    border-left: 3px solid var(--alerta);
+    color: #6b1a1a;
+  }
+  .nota {
+    background: var(--acento-bg);
+    border-left: 3px solid var(--acento);
+    color: #14432a;
+  }
+  .alerta > b:first-child, .nota > b:first-child {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 9.6pt;
+  }
+
+  /* ---------- Checklist ---------- */
+  .check { list-style: none; padding-left: 3px; }
+  .check li { padding-left: 17px; position: relative; margin: 3.5px 0; }
+  .check li::before {
+    content: "";
+    position: absolute; left: 0; top: 2.5px;
+    width: 9px; height: 9px;
+    border: 1.2px solid var(--suave);
+    border-radius: 1.5px;
+  }
+
+  /* ---------- Tablas ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 7px 0;
+    font-size: 8.7pt;
+    page-break-inside: avoid;
+  }
+  th {
+    background: var(--acento);
+    color: #fff;
+    text-align: left;
+    padding: 5px 7px;
+    font-weight: 600;
+    font-size: 8.5pt;
+  }
+  td {
+    padding: 5px 7px;
+    border-bottom: 1px solid var(--linea);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #fafbfc; }
+  td code { font-size: 8.1pt; }
+
+  .salida {
+    background: #10161f;
+    color: #b8e6c8;
+    padding: 8px 10px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.2pt;
+    line-height: 1.45;
+    margin: 6px 0;
+    border-radius: 2px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    page-break-inside: avoid;
+  }
+
+  .salto { page-break-before: always; }
+
+  footer {
+    margin-top: 20px;
+    padding-top: 7px;
+    border-top: 1px solid var(--linea);
+    font-size: 7.8pt;
+    color: var(--suave);
+  }
+</style>
+</head>
+<body>
+
+<div class="cabecera">
+  <h1>Guía de secuencia — Laboratorio TRITON</h1>
+  <p class="sub">Del clonado del repositorio al taller listo para impartirse</p>
+  <div class="meta">
+    <span><b>Taller:</b> Análisis forense OT con asistencia de IA</span>
+    <span><b>Evento:</b> CyberForce Summit 2026 · Track TECH-COM</span>
+    <span><b>Duración del taller:</b> 2 h</span>
+    <span><b>Modelo:</b> local, sin cuentas ni internet</span>
+    <span><b>Cadena verificada:</b> septiembre 2026, Ubuntu 24.04</span>
+  </div>
+</div>
+
+<div class="alerta">
+  <b>La regla que decide si esto funciona</b>
+  Todo el trabajo se hace con un <b>usuario sin privilegios</b>. Nunca root, nunca
+  <code>sudo</code>. Wireshark deshabilita los scripts Lua cuando corre como superusuario,
+  el disector de TriStation no carga, y <b>no hay mensaje de error</b>: simplemente verás
+  <code>UDP</code> en lugar de <code>TRISTATION</code> y el taller se queda sin sustancia.
+  Es la falla número uno y cuesta media hora encontrarla en vivo.
+</div>
+
+<h2><span class="num">0</span>Antes de empezar<span class="tiempo">10 min</span></h2>
+
+<p>Reúne esto antes de tocar la terminal. Nada de lo que sigue funciona sin ello.</p>
+
+<ul class="check">
+  <li>Hipervisor instalado y con espacio (VirtualBox, VMware, UTM o Proxmox)</li>
+  <li>ISO de <b>Ubuntu Server 24.04 LTS</b> descargada — es la versión con la que se verificó todo</li>
+  <li>Acceso al repositorio privado <code>cyberforcesummit2026_workshop</code></li>
+  <li>Credenciales de GitHub funcionando (token o SSH) — pruébalas antes</li>
+  <li>Una máquina anfitriona con <b>holgura para asignarle 8 GB de RAM</b> a la VM</li>
+  <li>Red decente para la descarga inicial: <b>son ~5 GB</b>, la mayoría pesos del modelo</li>
+  <li>Al menos <b>2 horas libres</b> para llegar hasta el ensayo sin interrupciones</li>
+</ul>
+
+<div class="nota">
+  <b>Lo que ya no necesitas</b>
+  Ni cuentas de proveedores de IA, ni tokens, ni que el venue deje pasar ningún
+  dominio. Con el modelo en local, la única red que hace falta es la de la
+  preparación.
+</div>
+
+<h2><span class="num">1</span>Construir la VM<span class="tiempo">25 min</span></h2>
+
+<table>
+  <tr><th style="width:26%">Recurso</th><th style="width:17%">Mínimo</th><th style="width:19%">Recomendado</th><th>Por qué</th></tr>
+  <tr><td>vCPU</td><td>4</td><td>8</td><td>La inferencia en CPU escala con núcleos</td></tr>
+  <tr><td>RAM</td><td>8 GB</td><td>16 GB</td><td>El modelo ocupa ~4 GB residentes</td></tr>
+  <tr><td>Disco</td><td>30 GB</td><td>40 GB</td><td>Pesos, Ollama, sistema y evidencia</td></tr>
+  <tr><td>Red</td><td colspan="2">NAT con internet</td><td>Sólo durante la preparación</td></tr>
+</table>
+
+<h3>Crear el usuario del laboratorio</h3>
+
+<p>No es cosmético. Es requisito funcional, por lo que dice el recuadro rojo de arriba.</p>
+
+<pre><code>sudo adduser analista
+sudo usermod -aG sudo analista
+su - analista</code></pre>
+
+<p>A partir de aquí, <b>todo se hace como <code>analista</code></b>.</p>
+
+<h2><span class="num">2</span>Clonar y provisionar<span class="tiempo">15 min</span></h2>
+
+<pre><code>cd ~
+git clone https://github.com/gustavo2107/cyberforcesummit2026_workshop.git taller
+cd taller
+make bootstrap</code></pre>
+
+<p><code>make bootstrap</code> hace todo de corrido y es idempotente — si algo falla a media,
+lo vuelves a correr sin romper nada. <b>Descarga unos 5 GB</b>, así que hazlo con red
+decente y nunca en el venue:</p>
+
+<ul>
+  <li>Se niega a correr si eres root, y te explica por qué</li>
+  <li>Instala <code>tshark</code> respondiendo <b>No</b> a la pregunta del setuid (aquí sólo se leen archivos PCAP, nunca se captura de la interfaz)</li>
+  <li>Descarga la evidencia desde el repositorio de Nozomi e imprime las huellas SHA-256</li>
+  <li>Instala el disector en la ruta de plugins que le pregunta a tu propio binario, sin asumirla</li>
+  <li>Instala Ollama, descarga el modelo y deja listos el cliente (<code>ollmcp</code>) y el servidor (<code>wireshark-mcp</code>)</li>
+  <li>Corre la verificación al final</li>
+</ul>
+
+<p>Si vas a usar un proveedor en la nube en lugar del modelo local:
+<code>SIN_MODELO=1 make bootstrap</code>.</p>
+
+<div class="nota">
+  <b>Guarda las huellas SHA-256 que imprime</b>
+  Compártelas con los participantes antes del evento. Es la forma de saber que todos
+  trabajan sobre el mismo archivo — y de paso es una lección de cadena de custodia que
+  sale gratis.
+</div>
+
+<h2><span class="num">3</span>Verificar la cadena<span class="tiempo">2 min</span></h2>
+
+<pre><code>./scripts/verify-setup.sh</code></pre>
+
+<div class="salida">[ok] tshark encontrado (TShark (Wireshark) 4.2.2)
+[ok] evidencia presente (896 paquetes)
+[ok] disector TriStation cargado
+[ok] protocolo detectado: TRISTATION
+[ok] deteccion TRITON en 2 tramas
+[ok] ollama encontrado
+[ok] servicio de ollama respondiendo en localhost:11434
+[ok] modelo afinado 'triton-analista' disponible
+
+LISTO — el taller es viable en esta maquina.</div>
+
+<p><b>No avances sin todas las líneas <code>[ok]</code>.</b> Todo lo que sigue depende de que
+el disector esté cargado. Si alguna falla, ve a la tarjeta de fallas al final de esta guía.</p>
+
+<h3>Comprobación rápida de que la evidencia es la correcta</h3>
+
+<pre><code>make stats     # 896 paquetes, 435 s, 192.168.1.88 ↔ 192.168.1.2
+make triton    # debe devolver las tramas 75 y 887</code></pre>
+
+<h2><span class="num">4</span>El modelo local y el cliente MCP<span class="tiempo">30 min</span></h2>
+
+<div class="nota">
+  <b>Todo el análisis corre dentro de la VM</b>
+  Sin llamadas a proveedores externos, sin cuentas y sin tokens. Durante el taller
+  no hace falta internet, y la evidencia nunca sale de la máquina — que en un taller
+  de forense OT no es un detalle menor.
+</div>
+
+<div class="nota">
+  <b>Verificado de punta a punta</b>
+  La cadena completa —<code>ollmcp</code> → <code>wireshark-mcp</code> →
+  <code>tshark</code> del sistema → <code>TriStation.lua</code>— se corrió en una VM
+  Ubuntu 24.04 y funciona. <b>El disector se hereda</b>, que era la incógnita que
+  decidía si este taller era viable: el modelo ve <code>TRISTATION</code>, no
+  <code>UDP</code>. Aun así, valídala tú en tu máquina: el hardware cambia.
+</div>
+
+<h3>4.1 Ollama y el modelo</h3>
+
+<pre><code>curl -fsSL https://ollama.com/install.sh | sh
+ollama pull qwen3.5:4b     # 3.4 GB, tarda
+
+# afinar: los valores por omisión de Ollama rompen este laboratorio
+cd ~/taller                # el Modelfile es ruta relativa al repo
+ollama create triton-analista -f setup/Modelfile
+ollama list                # debe aparecer triton-analista</code></pre>
+
+<div class="nota">
+  <b>Por qué hay que afinarlo</b>
+  Ollama trae <code>num_ctx</code> en <b>2048 tokens</b> y <code>temperature</code> en
+  <b>0.8</b>. Con 2048 la salida de <code>tshark</code> desborda el contexto y el modelo
+  pierde la evidencia a media sesión; con 0.8 fabrica justo la confabulación que el
+  taller enseña a detectar. <code>setup/Modelfile</code> los lleva a 8192 y 0.1, con
+  seed fijo para que el análisis sea reproducible.
+</div>
+
+<p><b>Por qué este modelo y no uno más grande.</b> El laboratorio no le pide al
+modelo que escriba bien: le pide que <b>invoque <code>tshark</code>, lea el
+resultado y no invente entre una llamada y otra</b>. En la evaluación de tool
+calling de 2026 sobre 40 casos deterministas, Qwen3.5 4B obtuvo <b>97.5% de
+acierto</b> — primer lugar, por encima de modelos cinco veces mayores, en 3.4 GB.
+Ahí es donde los modelos locales se separan.</p>
+
+<h3>4.2 El cliente y el servidor MCP</h3>
+
+<pre><code>sudo apt install -y pipx     # NO viene instalado por omisión
+pipx install ollmcp          # el cliente
+pipx install wireshark-mcp   # el servidor que expone tshark
+pipx ensurepath
+exec $SHELL                  # sin esto: "ollmcp: command not found"
+
+cd ~/taller
+ollmcp -m triton-analista -j setup/mcp-config.minimo.json</code></pre>
+
+<div class="alerta">
+  <b>Dos trampas en una sola línea</b>
+  <b>El flag es <code>--servers-json</code> (<code>-j</code>)</b>, no
+  <code>--mcp-server</code>: ése existe, pero espera la ruta a un script
+  <code>.py</code> o <code>.js</code>, y con el nombre de un binario responde
+  <code>Server script not found</code>.<br>
+  <b>Y el servidor es <code>wireshark-mcp</code>, no <code>mcp-wireshark</code>.</b>
+  El segundo instala limpio y no arranca: revienta con
+  <code>AttributeError: 'Server' object has no attribute 'list_tools'</code>, por
+  incompatibilidad con el SDK actual de MCP. No hay flag que lo arregle.
+</div>
+
+<div class="nota">
+  <b>Con pipx, no con pip</b>
+  Desde Ubuntu 24.04 rige PEP 668: <code>pip install --user</code> falla con
+  <code>externally-managed-environment</code> porque el Python del sistema lo gestiona
+  apt. <code>pipx</code> es además la vía correcta para una aplicación de línea de
+  comandos — entorno aislado y binario en el PATH.
+</div>
+
+<h3>4.3 Fijar los parámetros dentro del cliente</h3>
+
+<p><b>Este paso no es opcional, y es el que más fácil se salta.</b>
+<code>ollmcp</code> lleva su <b>propia</b> configuración de modelo. Aunque hayas
+construido <code>triton-analista</code> con el <code>Modelfile</code>, al abrir el
+panel de parámetros puedes encontrarte esto:</p>
+
+<div class="salida">/mc
+
+num_ctx        -
+temperature    -
+seed           -</div>
+
+<p>Un guión no quiere decir 8192, ni 0.1: quiere decir que <b>el cliente no está
+enviando ese parámetro</b>. Con <code>num_ctx</code> sin fijar vuelves al problema de
+raíz — el modelo se queda sin contexto a media línea de tiempo y, como no sabe decir
+"se me olvidó", rellena. Fíjalos ahí mismo y guárdalos:</p>
+
+<table>
+  <tr><th style="width:34%">Parámetro</th><th>Valor</th></tr>
+  <tr><td><code>num_ctx</code></td><td><code>8192</code></td></tr>
+  <tr><td><code>temperature</code></td><td><code>0.1</code></td></tr>
+  <tr><td><code>seed</code></td><td><code>42</code></td></tr>
+  <tr><td><code>/sc</code></td><td>Guarda en <code>~/.config/ollmcp/config.json</code></td></tr>
+</table>
+
+<div class="alerta">
+  <b>Ese archivo tiene que ir dentro de la OVA</b>
+  Si exportas la imagen sin <code>~/.config/ollmcp/config.json</code>, cada
+  participante arranca con los parámetros en <code>-</code> y el laboratorio se
+  comporta distinto en cada máquina — que es justo lo que la snapshot existe para
+  evitar. Confírmalo con <code>cat</code> antes del paso 5.
+</div>
+
+<h3>4.4 La pregunta de control</h3>
+
+<p>El mismo día del taller, antes de que llegue nadie:</p>
+
+<pre><code>Corre: tshark -r malware_exec.pcap -c 1
+y dime qué protocolo reporta.</code></pre>
+
+<div class="alerta">
+  <b>Debe responder TRISTATION — y debes ver la llamada a la herramienta</b>
+  Hay dos formas de fallar y se arreglan distinto. Distínguelas antes de seguir.
+</div>
+
+<table>
+  <tr><th style="width:34%">Qué ves</th><th style="width:30%">Qué pasa</th><th>Qué hacer</th></tr>
+  <tr>
+    <td>Responde <code>UDP</code></td>
+    <td>El disector no cargó: el proceso corre como root o sin el plugin</td>
+    <td>Tarjeta de fallas, primera fila</td>
+  </tr>
+  <tr>
+    <td>Responde algo plausible <b>sin llamar la herramienta</b></td>
+    <td>El modelo está inventando</td>
+    <td><b>Cambia de modelo. No sigas.</b></td>
+  </tr>
+</table>
+
+<p>El segundo caso es el grave: es exactamente el fallo que el taller entero enseña
+a detectar. Si el modelo lo hace en la validación, lo va a hacer toda la sesión.</p>
+
+<p><b>Cuando responde bien</b>, la prueba dura de que el disector llegó hasta el
+modelo es el campo <code>frame.protocols</code>:</p>
+
+<div class="salida">"frame.protocols": "eth:ethertype:ip:udp:tristation"</div>
+
+<p>Si termina en <code>udp</code>, la cadena está rota aunque el modelo suene
+convincente.</p>
+
+<h3>4.5 Lo que vas a ver, y no significa lo que parece</h3>
+
+<p>Tres cosas de la <i>herramienta</i> —no del caso— que salen en cuanto empiezas a
+consultar. Ninguna es un problema; todas confunden si te agarran en frío:</p>
+
+<ul>
+  <li>Las herramientas se listan con <code>/tools</code>, y <b>su numeración cambia
+  entre versiones del servidor</b>. No memorices números ni los pongas en el material
+  del participante: lo que se dicta en voz alta es el nombre.</li>
+  <li>Pedir la lista de paquetes con <code>limit: 1</code> devuelve <b>cabeceras, no
+  contenido</b>. Para ver los campos que decodifica el disector, la vía sigue siendo
+  <code>tshark -r &lt;archivo&gt; -c 1 -V</code>.</li>
+  <li>El resumen de <i>expert info</i> da <b>frecuencias, no números de trama</b>.
+  Sirve para saber <i>qué</i> aparece y <i>cuántas veces</i>; para saber <i>dónde</i>,
+  hace falta otra consulta.</li>
+</ul>
+
+<h3>4.6 Cuánto tarda</h3>
+
+<p>En la VM de referencia, cada consulta —la ida y vuelta completa: el modelo decide,
+llama la herramienta, lee el resultado y responde— tardó alrededor de <b>tres
+minutos</b> sobre CPU.</p>
+
+<div class="alerta">
+  <b>Mídelo en tu máquina y dilo en voz alta</b>
+  Ese número depende por entero del equipo: núcleos, RAM y si hay GPU. Sin el aviso,
+  alguien da por muerto el cliente a los veinte segundos y lo reinicia a media
+  consulta, perdiendo todo el contexto que llevaba anclado. El corolario que también
+  conviene decir: <b>cada consulta cuesta</b>, así que vale más pensar la pregunta
+  que dispararla.
+</div>
+
+<h3>4.7 Si el modelo local no da el ancho</h3>
+
+<p>No lo fuerces. La ruta con un proveedor en la nube sigue siendo válida
+(<code>SIN_MODELO=1 make bootstrap</code>). Pierdes la independencia de la red del
+venue y ganas capacidad. <b>Decídelo en tu ensayo, no en el salón.</b></p>
+
+<h2><span class="num">5</span>Snapshot<span class="tiempo">5 min</span></h2>
+
+<p>Con la verificación en verde y el MCP respondiendo TRISTATION, limpia y congela:</p>
+
+<pre><code>cat ~/.config/ollmcp/config.json    # PRIMERO: confirma que existe
+history -c
+sudo apt clean
+sudo rm -rf /tmp/*</code></pre>
+
+<p>Y toma un snapshot del hipervisor llamado <b><code>baseline-verificada</code></b>.</p>
+
+<p>Es tu red de seguridad: si un participante destruye su entorno a media sesión, reviertes
+en treinta segundos en lugar de perderlo. <b>Tómala después de verificar, nunca antes.</b></p>
+
+<h2><span class="num">6</span>Ensayar<span class="tiempo">2 h</span></h2>
+
+<p>El paso que todo mundo se salta y del que todo mundo se arrepiente. Corre el workbook
+completo tú mismo, con cronómetro, como si fueras participante — sin abrir la rúbrica.</p>
+
+<ul class="check">
+  <li>¿Alcanzan los 30 minutos del Bloque 3?</li>
+  <li>¿Llegaste solo a la trama 892, o necesitaste la pista?</li>
+  <li>¿Encontraste el <code>keyState</code>, o te lo dijo el modelo de memoria?</li>
+  <li>¿Cuántas afirmaciones de tu asistente no pudiste anclar a una trama?</li>
+  <li>¿Cuánto tardó cada consulta <b>en esta máquina</b>? Ése es el número que dices en voz alta.</li>
+</ul>
+
+<p>Después contrasta contra <code>docs/03-rubrica.md</code>. Lo que se te dificultó a ti se le
+va a dificultar a la sala, y ahí es donde ajustas las pistas.</p>
+
+<h3>Lo que te va a pasar en el ensayo — y es la mejor parte del taller</h3>
+
+<p>En la verificación de este laboratorio, al pedirle el resumen de <i>expert info</i>,
+la herramienta devolvió esto:</p>
+
+<div class="salida">Errors (3)
+  1  Undecoded  TRISTATION  Lua Error: TriStation.lua:611: negative length in tvb range
+  2  Malformed  TRISTATION  TRITON malware detected!
+
+Notes (2)
+  2  Protocol   Ethertype   Didn't find padding of zeros...</div>
+
+<p>El modelo produjo, a partir de ahí, <b>un hallazgo crítico correcto envuelto en dos
+sobreinterpretaciones perfectamente plausibles</b>:</p>
+
+<table>
+  <tr><th style="width:30%">Lo que leyó</th><th style="width:32%">Lo que concluyó</th><th>Qué es en realidad</th></tr>
+  <tr>
+    <td><code>TRITON malware detected!</code></td>
+    <td>Dos tramas con firma de TRITON</td>
+    <td><b>Correcto.</b> Es el hallazgo, y viene del disector</td>
+  </tr>
+  <tr>
+    <td><code>Lua Error: TriStation.lua:611</code></td>
+    <td>"Paquetes corruptos en la captura"</td>
+    <td>Un <b>bug del disector</b>, de 2018. Dispara una vez, siempre la misma trama</td>
+  </tr>
+  <tr>
+    <td><code>Didn't find padding of zeros</code></td>
+    <td>Posible "manipulación del paquete"</td>
+    <td>Aviso normal de Wireshark sobre el relleno de la trama Ethernet</td>
+  </tr>
+</table>
+
+<div class="alerta">
+  <b>Las reglas de anclaje no atrapan esto</b>
+  El modelo etiquetó las tres afirmaciones como <code>[EVIDENCIA]</code> — y en su
+  lógica lo eran: salieron de ejecutar un comando y citan literalmente lo que la
+  herramienta imprimió. Lo que falta es el paso siguiente, y hay que enseñarlo
+  explícito: <b>¿esto es una propiedad del tráfico, o del decodificador que lo está
+  leyendo?</b> Ésa es la pregunta que cierra el taller. Está desarrollada en
+  <code>docs/03-rubrica.md</code>, y ya es criterio de calificación con peso alto.
+</div>
+
+<p>Puedes dejar que le pase a algún equipo y recogerlo en la revelación, o proyectar
+el bloque de arriba y pedirle a la sala que diga qué concluiría. Funciona igual de
+bien, y no depende de que alguien pregunte lo correcto.</p>
+
+<h3>Graba el video de respaldo</h3>
+
+<p>Con el modelo en local ya no dependes de la red del venue, así que la falla más
+común desapareció. Pero el video sigue sin ser opcional, por otra razón: <b>un modelo
+pequeño puede portarse mal en vivo</b>. Si eso pasa, el video te deja seguir dando el
+taller como demo guiada en lugar de perderlo.</p>
+
+<h2><span class="num">7</span>Semana del taller<span class="tiempo">—</span></h2>
+
+<ul class="check">
+  <li>Publicar el brief y la guía de la VM <b>48 horas antes</b> — que nadie descargue nada en el salón</li>
+  <li>Comunicar las huellas SHA-256 a los participantes</li>
+  <li>Exportar la OVA y copiarla a <b>dos memorias USB</b> (no la distribuyas por el WiFi del venue)</li>
+  <li>Imprimir el workbook — hay quien trabaja mejor en papel</li>
+  <li>Confirmar que las laptops de los participantes pueden asignar <b>8 GB</b> a la VM</li>
+  <li>Validar la pregunta de control <b>el mismo día</b> — el modelo debe responder TRISTATION</li>
+  <li>Revisar <code>/mc</code> el mismo día: ningún parámetro en <code>-</code></li>
+  <li>Tener a la mano el tiempo por consulta medido, para anunciarlo al abrir</li>
+  <li>Preparar <b>dos mesas de rescate</b> con el entorno ya corriendo</li>
+  <li>Probar la VM en una máquina <b>que no sea la tuya</b></li>
+</ul>
+
+<h2><span class="num">8</span>Tarjeta de fallas<span class="tiempo">—</span></h2>
+
+<table>
+  <tr><th style="width:31%">Síntoma</th><th style="width:31%">Causa</th><th>Solución</th></tr>
+  <tr>
+    <td>Protocolo aparece como <code>UDP</code> y payload <code>data</code></td>
+    <td>Corriendo como root: Wireshark deshabilita Lua para superusuario</td>
+    <td>Usar el usuario sin privilegios. Nunca <code>sudo</code>.</td>
+  </tr>
+  <tr>
+    <td><code>tshark -G protocols &#124; grep tristation</code> no devuelve nada</td>
+    <td>El disector no cargó</td>
+    <td>Confirmar la ruta con <code>tshark -G folders</code>, o usar <code>-X lua_script:</code></td>
+  </tr>
+  <tr>
+    <td>Las huellas SHA-256 no coinciden</td>
+    <td>Alguien trabaja sobre otro archivo</td>
+    <td>Volver a correr <code>make evidence</code> y comparar antes de seguir</td>
+  </tr>
+  <tr>
+    <td>El asistente responde <code>UDP</code> a la pregunta de validación</td>
+    <td>El proceso del MCP corre como root o con otro usuario</td>
+    <td>Revisar bajo qué usuario arranca el MCP</td>
+  </tr>
+  <tr>
+    <td>El asistente responde sin llamar la herramienta</td>
+    <td>El modelo está inventando en lugar de consultar</td>
+    <td>Cambiar de modelo. No es recuperable con prompts.</td>
+  </tr>
+  <tr>
+    <td><code>pipx: command not found</code></td>
+    <td>No viene instalado en Ubuntu por omisión</td>
+    <td><code>sudo apt install -y pipx</code></td>
+  </tr>
+  <tr>
+    <td><code>ollmcp: command not found</code> tras instalarlo</td>
+    <td>Quedó en <code>~/.local/bin</code>, fuera del PATH de la sesión</td>
+    <td><code>pipx ensurepath &amp;&amp; exec $SHELL</code></td>
+  </tr>
+  <tr>
+    <td><code>pip</code>: <code>externally-managed-environment</code></td>
+    <td>PEP 668 en Ubuntu 24.04</td>
+    <td>Usar <code>pipx</code> para aplicaciones, <code>apt</code> para librerías</td>
+  </tr>
+  <tr>
+    <td><code>no Modelfile or safetensors files found</code></td>
+    <td>Ruta relativa: no estás dentro del repositorio</td>
+    <td><code>cd ~/taller</code> antes de <code>ollama create</code></td>
+  </tr>
+  <tr>
+    <td><code>ollama</code> no responde o el modelo no carga</td>
+    <td>Servicio caído, o RAM insuficiente en la VM</td>
+    <td><code>ollama ps</code>. Subir la RAM a 8 GB o más.</td>
+  </tr>
+  <tr>
+    <td>Cada consulta tarda ~3 minutos</td>
+    <td><b>Es normal en CPU.</b> No es una falla</td>
+    <td>Anúncialo al abrir la sesión. Más vCPU y RAM lo bajan; una GPU, mucho más.</td>
+  </tr>
+  <tr>
+    <td><code>Server script not found</code></td>
+    <td>Usaste <code>--mcp-server</code>: espera un <code>.py</code> o <code>.js</code></td>
+    <td><code>-j setup/mcp-config.minimo.json</code></td>
+  </tr>
+  <tr>
+    <td><code>AttributeError: 'Server' object has no attribute 'list_tools'</code></td>
+    <td>Es <code>mcp-wireshark</code>: incompatible con el SDK actual de MCP</td>
+    <td><code>pipx install wireshark-mcp</code> y cambiar el <code>command</code> del JSON</td>
+  </tr>
+  <tr>
+    <td>En <code>/mc</code> los parámetros aparecen como <code>-</code></td>
+    <td>El cliente no los está enviando: el <code>Modelfile</code> no basta</td>
+    <td>Fijarlos en <code>/mc</code> y guardar con <code>/sc</code></td>
+  </tr>
+  <tr>
+    <td>El modelo reporta "paquetes corruptos"</td>
+    <td>Leyó el bug de Lua del disector como propiedad del tráfico</td>
+    <td>No se arregla: <b>es material del taller.</b> Ver la sección 6</td>
+  </tr>
+  <tr>
+    <td>El asistente inventa IOCs o dominios</td>
+    <td>Falta la regla de anclaje, o el disector no está cargado</td>
+    <td>Pegar <code>prompts/00-reglas-de-anclaje.md</code> antes de cualquier pregunta</td>
+  </tr>
+  <tr>
+    <td>El conteo de paquetes no es 896</td>
+    <td>PCAP incorrecto o truncado</td>
+    <td><code>make clean &amp;&amp; make evidence</code></td>
+  </tr>
+</table>
+
+<h2><span class="num">9</span>Referencia rápida<span class="tiempo">—</span></h2>
+
+<table>
+  <tr><th style="width:34%">Comando</th><th>Qué hace</th></tr>
+  <tr><td><code>make bootstrap</code></td><td>Provisiona la VM de cero a verificada</td></tr>
+  <tr><td><code>make evidence</code></td><td>Descarga la evidencia desde el origen</td></tr>
+  <tr><td><code>make verify</code></td><td>Valida la cadena completa</td></tr>
+  <tr><td><code>make stats</code></td><td>Resumen de la captura</td></tr>
+  <tr><td><code>make triton</code></td><td>Tramas donde el disector detecta TRITON</td></tr>
+  <tr><td><code>make clean</code></td><td>Borra la evidencia descargada</td></tr>
+  <tr><td><code>make hooks</code></td><td>Activa el hook de pre-commit</td></tr>
+  <tr><td><code>make check-docs</code></td><td>Verifica que no falte documentación</td></tr>
+  <tr><td><code>ollama list</code></td><td>Modelos descargados</td></tr>
+  <tr><td><code>ollama ps</code></td><td>Si el modelo está cargado en memoria</td></tr>
+  <tr><td><code>ollmcp -m triton-analista -j setup/mcp-config.minimo.json</code></td><td>Arranca el cliente con el servidor MCP</td></tr>
+</table>
+
+<h3>Dentro del cliente</h3>
+
+<table>
+  <tr><th style="width:34%">Comando</th><th>Qué hace</th></tr>
+  <tr><td><code>/mc</code></td><td>Panel de parámetros del modelo. <b>Ninguno debe decir <code>-</code></b></td></tr>
+  <tr><td><code>/sc</code></td><td>Guarda la configuración en <code>~/.config/ollmcp/config.json</code></td></tr>
+  <tr><td><code>/tools</code></td><td>Herramientas disponibles. La numeración cambia entre versiones</td></tr>
+</table>
+
+<h3>Los números que debes reconocer de memoria</h3>
+
+<table>
+  <tr><th style="width:34%">Dato</th><th>Valor</th></tr>
+  <tr><td>Paquetes / duración</td><td>896 / 435.39 s</td></tr>
+  <tr><td>Hosts</td><td>192.168.1.88 (estación) ↔ 192.168.1.2 (Triconex), UDP 1502</td></tr>
+  <tr><td>Ruido de fondo</td><td>676 tramas (75%) de <i>Get CP status</i></td></tr>
+  <tr><td>Detecciones de TRITON</td><td>Tramas 75 y 887</td></tr>
+  <tr><td>El detalle que casi nadie ve</td><td>Trama 891 <i>Run program</i> → trama 892 <b>Command rejected</b></td></tr>
+  <tr><td>El hallazgo</td><td><code>keyState = 0x01 [Program]</code> constante en las 338 respuestas</td></tr>
+  <tr><td>Lo que <b>no</b> es del caso</td><td>El <code>Lua Error</code> de <code>TriStation.lua:611</code> y el aviso de <i>padding</i> de Ethernet: artefactos de la herramienta</td></tr>
+  <tr><td>La prueba de que el disector llegó al modelo</td><td><code>frame.protocols</code> termina en <code>:tristation</code></td></tr>
+</table>
+
+<footer>
+  Guía de secuencia del laboratorio · Repositorio <code>cyberforcesummit2026_workshop</code> ·
+  Documentación completa en <code>docs/</code> · Evidencia y disector: Nozomi Networks, BSD-3-Clause
+</footer>
+
+</body>
+</html>

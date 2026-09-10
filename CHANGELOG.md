@@ -2,6 +2,89 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.13.0] — 2026-09-10
+
+Segunda corrida completa en la VM, esta vez recorriendo el flujo del workbook.
+Todo lo que sigue esta verificado corriendo y es reproducible con `seed 42`.
+
+### Corregido — la trampa del flag `-m`
+
+- **`ollmcp -m triton-analista` NO carga el modelo afinado.** `ollama` etiqueta
+  el modelo como `triton-analista:latest` y `ollmcp` compara la cadena completa:
+  avisa en una sola linea —`Requested model triton-analista is not available —
+  using qwen3.5:4b instead`— y **arranca con el modelo base**
+- Es la trampa mas silenciosa del laboratorio: las herramientas funcionan, el
+  disector se hereda, las respuestas se ven bien. Lo que se pierde es el
+  `SYSTEM` del `Modelfile` — o sea, exactamente lo que el taller mide
+- El arranque correcto es **`ollmcp -j setup/mcp-config.minimo.json`**, sin
+  `-m`: el `config.json` ya trae el modelo. Corregido en README, `docs/06`,
+  `docs/07`, `docs/10`, `SETUP.md`, el `Modelfile` y `bootstrap-vm.sh`
+- Comprobacion de un vistazo: el prompt del cliente debe decir
+  `triton-analista/…`, no `qwen3.5/…`
+
+### Agregado — `setup/ollmcp-config.json`
+
+La configuracion del cliente tal como quedo verificada. Se instala con
+`cp setup/ollmcp-config.json ~/.config/ollmcp/config.json` y trae:
+
+- `num_ctx 8192`, `temperature 0.1`, `seed 42`
+- **La curaduria de herramientas: 9 habilitadas de 52.** Las 43 apagadas
+  incluyen toda la deteccion automatica del servidor —`detect_beaconing`,
+  `detect_port_scan`, `extract_credentials`, `yara_scan`— que sobre esta captura
+  no produce hallazgos, produce ruido plausible. El propio servidor recomienda
+  tres de ellas al abrir el archivo, y un modelo pequeno sigue recomendaciones:
+  la curaduria es lo que impide que el taller se vuelva una caceria de falsos
+  positivos
+- HIL activo, `loopLimit 7`, razonamiento visible
+
+### Reescrito — `docs/03`, los modos de falla del analista
+
+La seccion de artefactos pasa a ser el catalogo completo, con las salidas
+textuales. Tesis en una frase: **el modelo extrae bien y explica mal**.
+
+Tres familias, todas observadas:
+
+- **A · Artefacto de la herramienta leido como propiedad del trafico** — el bug
+  de Lua (`TriStation.lua:611`), el aviso de *padding* de Ethernet, y
+  `_ws.lua.fake` ofrecido como "posible inyeccion de codigo". El argumento que
+  los mata a los tres: **aparece en 896 de 896 tramas**; un indicador presente
+  en el 100% de una captura no distingue nada
+- **B · Columna mal leida convertida en dato duro** — la columna `Frequency` de
+  *expert info* leida como numero de trama: el modelo escribio "(frame 2)" con
+  etiqueta `[EVIDENCIA]`. **Las tramas son la 75 y la 887.** Tambien afirmo "en
+  todas las tramas" sobre una salida truncada en `[Showing 500/897 lines]`
+- **C · Etiqueta mal puesta** — marco `[CONOCIMIENTO]` sobre evidencia real y
+  `[EVIDENCIA]` sobre lo inventado. Las etiquetas no son la verificacion: son el
+  sitio donde se aplica
+
+Y el caso central, sobre el hallazgo mismo: pedido de extraer `ts_cp_keyState`,
+el modelo **acerto el valor constante `0x01` y tradujo *key* como "tecla"** en
+vez de llave fisica. El disector entrega el campo; el significado lo pone el
+humano. Es la tesis del taller demostrada sobre su propia respuesta.
+
+Se agrega tambien el A/B contra el modelo base, que salio de una corrida
+accidental: misma pregunta, misma evidencia, mismas 9 herramientas. Sin el
+`SYSTEM`, el modelo respondio "el protocolo principal es **UDP**" teniendo
+`eth:ethertype:ip:udp:tristation` en la mano.
+
+### Cambiado — `docs/10`
+
+- Pegar `prompts/00-reglas-de-anclaje.md` pasa de refuerzo a **requisito**: el
+  `SYSTEM` del `Modelfile` por si solo no basta. En el ensayo el modelo respondio
+  sin una sola etiqueta hasta que se le recordaron
+- Anadida la comprobacion del prompt del cliente antes de cada sesion
+
+### Notas de la herramienta
+
+- `wireshark_get_file_info` imprime el **SHA-256**, que cuadra con la huella del
+  repositorio: mejor pregunta de control que la anterior, valida cadena de
+  custodia y disector de un tiro
+- `extract_fields` devuelve una linea por trama, vacias incluidas: 896 lineas de
+  las que solo 338 traen dato. Conviene filtrar antes de extraer
+- La jerarquia de protocolos muestra `ts.crc16` en 895 y `text` en 1 — una trama
+  sin CRC y con capa de texto, casi con seguridad la misma del error de Lua.
+  Buena pista para el Bloque 2
+
 ## [0.12.0] — 2026-09-10
 
 Primera corrida completa del laboratorio con el modelo local en la VM, de punta

@@ -215,10 +215,12 @@ cat <<'EOF'
 Siguiente paso: conectar el servidor MCP de tshark.
 
   1. Arranca el cliente:
-       ollmcp -m triton-analista -j setup/mcp-config.minimo.json
+       ollmcp -j setup/mcp-config.minimo.json
 
      El flag es --servers-json (-j). NO --mcp-server: ese espera la ruta a
      un script .py o .js y responde "Server script not found".
+     Y NO pases -m: con la etiqueta incompleta arranca el modelo BASE, sin
+     las reglas de anclaje. El prompt debe decir triton-analista.
 
   2. Fija los parametros DENTRO del cliente -- este paso se salta solo:
        /mc     -> num_ctx 8192, temperature 0.1, seed 42

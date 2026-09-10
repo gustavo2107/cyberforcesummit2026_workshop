@@ -137,7 +137,7 @@ que es el único verificado corriendo en esta cadena:
 
 ```bash
 pipx install wireshark-mcp
-ollmcp -m triton-analista -j setup/mcp-config.minimo.json
+ollmcp -j setup/mcp-config.minimo.json
 ```
 
 Otras opciones existen —[`WireMCP`](https://github.com/0xKoda/WireMCP),

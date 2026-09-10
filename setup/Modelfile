@@ -3,10 +3,15 @@
 # Construye una variante afinada del modelo base para trabajo forense.
 #
 #     ollama create triton-analista -f setup/Modelfile
-#     ollmcp -m triton-analista -j setup/mcp-config.minimo.json
+#     ollmcp -j setup/mcp-config.minimo.json
 #
 # El flag es --servers-json (-j). NO --mcp-server: ese espera la ruta a un
 # script .py o .js y responde "Server script not found".
+#
+# Y NO pases -m: ollama etiqueta esto como "triton-analista:latest" y ollmcp
+# compara la cadena completa. Con "-m triton-analista" avisa en una linea y
+# arranca con el modelo BASE, sin nada de lo que sigue. El prompt del cliente
+# debe decir triton-analista, no qwen3.5.
 #
 # Construir la variante NO basta: ollmcp lleva su propia configuracion de
 # modelo y puede arrancar sin enviar estos parametros --se ven como "-" en el

@@ -313,10 +313,26 @@ Arrancas el cliente apuntando a ese archivo:
 
 ```bash
 cd ~/taller
-ollmcp --model triton-analista --servers-json setup/mcp-config.minimo.json
+ollmcp -j setup/mcp-config.minimo.json
 ```
 
-En corto: `ollmcp -m triton-analista -j setup/mcp-config.minimo.json`
+> **No pases `-m`.** Parece inofensivo y es la trampa más silenciosa de todo el
+> laboratorio. `ollama` etiqueta el modelo como `triton-analista:latest`, y
+> `ollmcp` compara la cadena completa: con `-m triton-analista` **no encuentra
+> coincidencia, avisa en una línea y arranca con el modelo base**:
+>
+> ```
+> Requested model triton-analista is not available — using qwen3.5:4b instead.
+> ```
+>
+> El laboratorio corre igual. Las herramientas funcionan, el disector se hereda,
+> las respuestas se ven bien. Lo que se perdió es el `SYSTEM` del `Modelfile`:
+> sin reglas de anclaje, sin etiquetas, sin "una herramienta a la vez". Es
+> decir, exactamente lo que el taller mide.
+>
+> El `config.json` ya trae el modelo correcto, así que lo seguro es **omitir el
+> flag**. Y antes de cada sesión, mira el prompt: debe decir
+> `triton-analista/…`, no `qwen3.5/…`. Esa línea es tu comprobación.
 
 > **El flag es `--servers-json`, no `--mcp-server`.** Es el error fácil de
 > cometer: `--mcp-server` existe, pero espera **la ruta a un script `.py` o
@@ -369,6 +385,51 @@ Y **guárdalos**, para que sobrevivan al siguiente arranque:
 
 La configuración queda en `~/.config/ollmcp/config.json`. En la VM del taller,
 `/home/analista/.config/ollmcp/config.json`.
+
+#### La configuración verificada, ya escrita
+
+`setup/ollmcp-config.json` es el archivo tal como quedó en la VM de referencia.
+Instalarlo ahorra el paso manual:
+
+```bash
+mkdir -p ~/.config/ollmcp
+cp setup/ollmcp-config.json ~/.config/ollmcp/config.json
+```
+
+Trae los parámetros correctos y, sobre todo, **la curaduría de herramientas**:
+9 habilitadas de 52.
+
+| Habilitada | Para qué |
+|---|---|
+| `wireshark_open_file` | Abrir la captura y ver qué protocolos trae |
+| `wireshark_get_file_info` | Metadatos y **SHA-256** — cadena de custodia |
+| `wireshark_stats_protocol_hierarchy` | Bloque 1: el terreno |
+| `wireshark_stats_conversations` | Bloque 1: quién habla con quién |
+| `wireshark_stats_expert_info` | Bloque 2: las anomalías que reporta el disector |
+| `wireshark_get_packet_list` | Bloque 3: la línea de tiempo |
+| `wireshark_get_packet_details` | Una trama a fondo |
+| `wireshark_extract_fields` | Bloques 3 y 4: extraer campos del disector |
+| `wireshark_search_packets` | Filtrar por expresión |
+
+Las 43 restantes están apagadas a propósito. El servidor trae detección
+automática —`detect_beaconing`, `detect_port_scan`, `extract_credentials`,
+`yara_scan`— y en esta captura **ninguna produce un hallazgo real**: producen
+salida plausible sobre tráfico industrial que no es ni web ni C2. Peor aún, el
+propio servidor las *recomienda* al abrir el archivo:
+
+```
+Recommended Tools (3):
+  wireshark_detect_dos_attack ...
+  wireshark_detect_port_scan ...
+  wireshark_geoip_enrich ...
+```
+
+Las tres son irrelevantes aquí. Un modelo pequeño sigue recomendaciones, así que
+la curaduría no es cosmética: **es lo que impide que el taller se convierta en
+una cacería de falsos positivos**.
+
+> Si prefieres hacerlo a mano, el panel es `/tools` (o `/t`). La numeración
+> cambia entre versiones del servidor, así que ve por nombre.
 
 > **Para la OVA:** ese archivo tiene que estar dentro de la imagen antes de
 > exportarla. Si no, cada participante arranca con los parámetros en `-` y el

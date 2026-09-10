@@ -201,91 +201,198 @@ constante, es el hallazgo del taller.
 
 ---
 
-## Los artefactos de la herramienta — el caso real que salió en el ensayo
+## Los modos de falla del analista — material verificado
 
 Esta sección no es sobre TRITON. Es sobre el modelo, y es el mejor material que
-tiene el taller para la discusión de cierre, porque **pasó de verdad** en la
-verificación del laboratorio, con el modelo local y el disector cargado.
+tiene el taller para la discusión de cierre, porque **todo lo que sigue pasó de
+verdad**, con el modelo local, el disector cargado y `seed 42`. Es reproducible:
+si corres las mismas consultas, sale lo mismo.
 
-Al pedirle el resumen de *expert info* de la captura, la herramienta devolvió
-esto:
+El patrón general, y la única frase que la sala tiene que llevarse:
+
+> El modelo **extrae bien y explica mal**. Lo que saca del comando suele ser
+> correcto; lo que dice que *significa* es donde inventa. Y las dos cosas
+> llegan en el mismo párrafo, con el mismo tono de seguridad.
+
+### Las tres familias
+
+| | Qué pasa | Cómo se detecta |
+|---|---|---|
+| **A** | Un artefacto de la **herramienta** leído como propiedad del **tráfico** | ¿Esto lo produjo la red, o el decodificador? |
+| **B** | Una **columna mal leída** convertida en dato duro | Vuelve a la salida cruda y busca el número |
+| **C** | Una **etiqueta mal puesta** — `[EVIDENCIA]` sobre lo inventado | Pide el comando que lo respalda |
+
+---
+
+### Familia A — el artefacto de la herramienta
+
+Tres casos, todos reales.
+
+**A.1 · El error de Lua.** Al pedir el resumen de *expert info*, la herramienta
+devuelve:
 
 ```
 Errors (3)
-  1  Undecoded  TRISTATION  Lua Error: TriStation.lua:611: negative length in tvb range
-  2  Malformed  TRISTATION  TRITON malware detected!
+   Frequency      Group           Protocol  Summary
+           1  Undecoded         TRISTATION  Lua Error: .../TriStation.lua:611: negative length in tvb range
+           2  Malformed         TRISTATION  TRITON malware detected!
 
 Notes (2)
-  2  Protocol   Ethertype   Didn't find padding of zeros...
+   Frequency      Group           Protocol  Summary
+           2  Protocol          Ethertype  Didn't find padding of zeros, and an undecoded trailer exists.
 ```
 
-El modelo produjo, a partir de ahí, **un hallazgo crítico correcto envuelto en
-dos sobreinterpretaciones perfectamente plausibles**.
+El modelo concluyó: *"sugiere corrupción o manipulación del protocolo
+TRISTATION"*.
 
-### Lo que acertó
+No la hay. Es **un bug del disector**: el script de Nozomi es de 2018 y en una
+trama calcula un rango de longitud negativa. Dispara una vez, siempre la misma.
+`Undecoded` significa *"la herramienta no pudo leer esto"*, no *"esto está
+dañado"*.
 
-Reportó las dos tramas marcadas como `TRITON malware detected!`. Es correcto y
-es el hallazgo: viene del disector, que trae la firma, y se puede reproducir con
-`make triton`.
+**A.2 · El relleno de ceros.** De la misma salida, el modelo ofreció *"podría
+indicar modificación maliciosa del paquete"*. Es un aviso normal de Wireshark
+sobre el relleno de la trama Ethernet cuando el paquete es más corto que el
+mínimo del medio. Aparece en capturas perfectamente sanas.
 
-### Sobreinterpretación 1 — el error de Lua
+**A.3 · `_ws.lua.fake`.** Al pedir la jerarquía de protocolos:
 
-El modelo leyó `Lua Error: TriStation.lua:611: negative length in tvb range` y
-concluyó que había **paquetes corruptos en la captura**.
+```
+udp                    frames:896
+  _ws.lua.fake         frames:896
+    tristation         frames:896
+      ts.crc16         frames:895
+      text             frames:1
+```
 
-No los hay. Ese mensaje es **un bug del disector**, no una propiedad del
-tráfico: el script de Nozomi es de 2018, y en una trama de esta captura calcula
-un rango de longitud negativa y Lua lo aborta. Dispara **una vez**, siempre la
-misma, y es reproducible.
+El modelo concluyó: *"sugiere posible **inyección de código** o manipulación del
+protocolo"*.
 
-La distinción que hay que hacerle ver a la sala: `Undecoded` significa *"la
-herramienta no pudo leer esto"*, no *"esto está dañado"*. Son cosas distintas y
-el reporte las funde en una sola frase.
+Es la capa puente que Wireshark inserta cuando un disector **escrito en Lua**
+registra sus campos. La creó `TriStation.lua`. Es la firma de la propia
+herramienta.
 
-### Sobreinterpretación 2 — el relleno de ceros
+Y aquí está el argumento que mata a los tres de un golpe, que es lo que vale la
+pena enseñar:
 
-El modelo leyó `Didn't find padding of zeros...` y lo ofreció como posible
-**manipulación del paquete**.
+> **Aparece en 896 de 896 tramas.** Si fuera inyección, estaría también en las
+> 676 tramas de *polling* benigno. Un indicador presente en el 100% de una
+> captura no distingue nada — y un hallazgo que no separa señal de ruido no es
+> un hallazgo, es el instrumento.
 
-Tampoco. Ese aviso lo emite Wireshark sobre el relleno de la trama Ethernet
-cuando el paquete es más corto que el mínimo del medio. Aparece en capturas
-perfectamente normales y no dice nada sobre quién generó el tráfico.
+De paso: en esa misma salida hay dos asimetrías que el modelo **no** comentó y
+que sí son señal — `ts.crc16` en 895 y `text` en 1. Una trama de 896 no tiene
+CRC y trae una capa de texto. Es, casi con seguridad, la misma que dispara el
+error de Lua. Buena pista para el Bloque 2, y ningún equipo la mira.
 
-### Por qué esto es la mejor parte del taller
+---
 
-Ninguna de las dos afirmaciones es un disparate. Las dos:
+### Familia B — la columna mal leída
 
-- salieron de ejecutar un comando de verdad,
-- citan literalmente lo que la herramienta imprimió,
-- suenan a analista competente,
-- y **son falsas** — no sobre la evidencia, sino sobre qué es evidencia.
+De la salida de *expert info* de arriba, el modelo escribió:
 
-Es el modo de falla que de verdad se ve en un SOC, y no es el que la gente
-espera. Nadie se imagina un modelo inventando de la nada; lo que hace es tomar
-la salida de la herramienta al pie de la letra y atribuirle al *tráfico* lo que
-son propiedades del *decodificador*.
+> `[EVIDENCIA]` Error 2 (Malformed, TRISTATION): "TRITON malware detected!"
+> **(frame 2)**
 
-Las reglas de anclaje no lo atrapan solas. El modelo etiquetó las dos
-afirmaciones como `[EVIDENCIA]` — y en su lógica lo eran: salieron de un
-comando. Lo que falta es el paso siguiente, que hay que enseñar explícitamente:
+**Las tramas son la 75 y la 887.** La columna que leyó dice `Frequency`: es
+*cuántas veces* ocurre, no *dónde*. Se comprueba en un comando:
 
-> **¿Esto es una propiedad del tráfico, o una propiedad de la herramienta que
-> lo está leyendo?**
+```bash
+make triton
+```
 
-Ésa es la pregunta que cierra el taller.
+Un número de trama **inventado**, con etiqueta de evidencia, dentro de un
+reporte por lo demás correcto. Si sólo puedes mostrar un ejemplo en toda la
+sesión, muestra éste.
+
+La regla operativa que sale de aquí:
+
+> El resumen de *expert info* da **frecuencias, no números de trama**. Para
+> saber *dónde*, hace falta otra consulta.
+
+---
+
+### Familia C — la etiqueta mal puesta
+
+En la misma respuesta, el modelo etiquetó:
+
+- `[CONOCIMIENTO] El disector ha detectado anomalías en la captura` — eso salió
+  de ejecutar un comando. Es `[EVIDENCIA]`.
+- `[EVIDENCIA] ... (frame 2)` — eso no salió de ningún lado. Es invención.
+
+**Etiquetó al revés.** Y ésa es la lección que cierra el taller:
+
+> Las etiquetas no *son* la verificación. Son el sitio donde se aplica. Un
+> reporte con `[EVIDENCIA]` en todas partes no está anclado: está maquillado.
+> Lo que ancla es que puedas correr el comando y ver la trama.
+
+---
+
+### El caso del `keyState` — extrae bien, interpreta mal
+
+Es el más importante, porque ocurre justo sobre el hallazgo del taller.
+
+Pedido de extraer `ts.ts_cp_keyState` y `ts.ts_cp_runState`, el modelo acertó lo
+medible: **`0x01` y `0x00`, constantes**. Y después escribió:
+
+> `[CONOCIMIENTO]` `ts.ts_cp_keyState`: Estado de la **tecla** (0x01 =
+> presionada/activa)
+
+No es una tecla. Es la **llave física** del selector del Triconex, y `0x01`
+significa que estaba en posición **PROGRAM**. Traducir *key* como *tecla* en vez
+de *llave* destruye el hallazgo entero: convierte el control que habría detenido
+el incidente en un detalle de teclado.
+
+Dos cosas que enseñar con esto:
+
+1. **La etiqueta funcionó.** El modelo marcó esa frase como `[CONOCIMIENTO]` —
+   es decir, "esto no lo verifiqué aquí". El sistema avisó correctamente y aun
+   así el analista se lo puede tragar si no lee las etiquetas. Léelas.
+2. **El modelo no sabe TriStation, y no puede saberlo.** El disector le entrega
+   el campo; el significado lo pone el humano. Ésa es la tesis del taller en una
+   sola línea, demostrada sobre el hallazgo central.
+
+Además, la respuesta generalizó a partir de datos truncados: la herramienta
+devolvió `[Showing 500/897 lines]` y el modelo afirmó *"en todas las tramas"*
+como `[EVIDENCIA]`. Nunca contó las 338. Es la familia B otra vez, en su forma
+más común: **afirmar más de lo que el comando devolvió**.
+
+> **Nota práctica.** `extract_fields` devuelve una línea por trama, vacías
+> incluidas: 896 líneas de las que sólo 338 traen dato. Se desperdicia contexto
+> y se invita a la generalización. Enseña a filtrar antes de extraer.
+
+---
 
 ### Cómo usarlo en la sesión
 
 Dos opciones, según cómo venga el tiempo:
 
-1. **Que les pase a ellos.** Si algún equipo pide el resumen de *expert info*,
-   va a ver lo mismo. Déjalo correr y recógelo en la revelación.
-2. **Enseñarlo directo.** Proyecta el bloque de arriba, pide a la sala que
-   diga qué concluiría, y contrasta. Funciona igual de bien y no depende de
-   que alguien pregunte lo correcto.
+1. **Que les pase a ellos.** Si algún equipo pide *expert info* o extrae el
+   `keyState`, va a ver lo mismo. Déjalo correr y recógelo en la revelación.
+2. **Enseñarlo directo.** Proyecta las salidas de arriba, pide a la sala que
+   diga qué concluiría, y contrasta. Funciona igual de bien y no depende de que
+   alguien pregunte lo correcto.
 
-En cualquier caso, la salida de arriba es reproducible y está aquí para que
-puedas mostrarla aunque el modelo no coopere ese día.
+Todas las salidas de esta sección son reproducibles con `seed 42`, así que
+puedes mostrarlas aunque el modelo no coopere ese día.
+
+### El A/B que vale toda la sesión
+
+Si tienes cinco minutos al cierre, corre la **misma** pregunta contra el modelo
+base y contra `triton-analista`. Con el base —sin el `SYSTEM` del `Modelfile`—
+la respuesta a "¿qué protocolo reporta la primera trama?" fue:
+
+> *"El protocolo principal que reporta la primera trama es **UDP**"*
+
+…cuando la herramienta le había devuelto, textualmente,
+`"frame.protocols": "eth:ethertype:ip:udp:tristation"`. Enterró el hallazgo bajo
+el modelo OSI, añadió *"el puerto 1502 es típicamente utilizado por el servicio
+Tris"* —memoria de entrenamiento presentada como hecho, sin etiquetar— y encadenó
+tres herramientas sin leer entre una y otra.
+
+Misma evidencia, mismas 9 herramientas, mismo hardware. Lo único distinto son
+las reglas. Proyectadas lado a lado, nadie vuelve a preguntar para qué sirve el
+anclaje.
 
 ---
 

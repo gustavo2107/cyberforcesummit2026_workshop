@@ -124,8 +124,15 @@ inventariado en **[`docs/11-descargas.md`](docs/11-descargas.md)**.
 **¿Ya tienes las líneas en verde?** Falta conectar el modelo con `tshark`:
 
 ```bash
-ollmcp -m triton-analista -j setup/mcp-config.minimo.json
+mkdir -p ~/.config/ollmcp
+cp setup/ollmcp-config.json ~/.config/ollmcp/config.json
+ollmcp -j setup/mcp-config.minimo.json
 ```
+
+`ollmcp-config.json` trae los parámetros verificados y la curaduría de
+**9 herramientas de 52**. **No pases `-m`:** con la etiqueta incompleta, `ollmcp`
+avisa en una línea y arranca el modelo **base**, sin reglas de anclaje. El prompt
+del cliente debe decir `triton-analista`, no `qwen3.5`.
 
 Y dentro del cliente, antes de la primera consulta:
 
@@ -213,6 +220,7 @@ docs/
 setup/
   SETUP.md               Instalación y trampas conocidas
   Modelfile              Afinado del modelo local para trabajo forense
+  ollmcp-config.json     Configuracion verificada del cliente: parametros + 9/52 herramientas
   mcp-config.minimo.json El que se le pasa a ollmcp
   mcp-config.example.json  El mismo, comentado y con alternativas
   Dockerfile             Alternativa a la VM

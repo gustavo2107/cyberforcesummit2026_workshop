@@ -7,7 +7,7 @@
     "Para pasarselo a ollmcp usa mcp-config.minimo.json, que solo tiene el",
     "bloque mcpServers:",
     "",
-    "    ollmcp -m triton-analista -j setup/mcp-config.minimo.json",
+    "    ollmcp -j setup/mcp-config.minimo.json",
     "",
     "El flag es --servers-json (-j). NO --mcp-server: ese espera la ruta a un",
     "script .py o .js, no el nombre de un binario.",

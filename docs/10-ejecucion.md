@@ -79,12 +79,20 @@ ollama run triton-analista "responde solo: listo" --verbose
 
 ```bash
 cd ~/taller
-ollmcp --model triton-analista --servers-json setup/mcp-config.minimo.json
+ollmcp -j setup/mcp-config.minimo.json
 ```
 
 El flag es **`--servers-json`** (o `-j`). No `--mcp-server`: ése espera la ruta
 a un script `.py` o `.js`, no el nombre de un binario, y responde
 `Server script not found` si le pasas uno.
+
+**Y no pases `-m`.** El `config.json` ya trae el modelo. Si lo pasas y no
+escribes la etiqueta completa —`triton-analista:latest`, no `triton-analista`—
+`ollmcp` avisa en una línea y **arranca con el modelo base**, sin las reglas de
+anclaje. El laboratorio corre igual y el taller pierde su objeto de estudio.
+
+**Mira el prompt antes de cada sesión.** Debe decir `triton-analista/…`. Si dice
+`qwen3.5/…`, sal y vuelve a entrar.
 
 El servidor que va en ese JSON es **`wireshark-mcp`**. `mcp-wireshark` instala
 pero no arranca — ver `07-laboratorio-vm.md`, sección 7.5.
@@ -163,6 +171,12 @@ Esto va primero y sin excepción. Es lo que obliga al modelo a separar
 `[EVIDENCIA]` de `[INFERENCIA]` de `[CONOCIMIENTO]`, y sin ello el resto del
 taller no se puede medir. Un participante que empieza a preguntar sin haber
 pegado las reglas va a producir un reporte que se lee bien y no prueba nada.
+
+> **No basta con el `Modelfile`.** Las reglas están en su `SYSTEM`, y aun así el
+> modelo las ignora en la primera consulta si nadie se las pega: en el ensayo
+> respondió sin una sola etiqueta hasta que se le recordaron. Un modelo de 4B con
+> razonamiento encendido gasta su obediencia en pensar, no en formatear. Pegar
+> `00-reglas-de-anclaje.md` es requisito, no refuerzo.
 
 ### Paso 3 — Los bloques
 

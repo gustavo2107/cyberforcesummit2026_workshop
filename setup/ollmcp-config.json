@@ -1,0 +1,104 @@
+{
+  "defaultProvider": "ollama",
+  "providers": {
+    "ollama": {
+      "host": "http://localhost:11434",
+      "model": "triton-analista:latest",
+      "apiKey": ""
+    }
+  },
+  "enabledTools": {
+    "tshark.wireshark_get_capabilities": false,
+    "tshark.wireshark_get_file_info": true,
+    "tshark.wireshark_merge_pcaps": false,
+    "tshark.wireshark_text2pcap_import": false,
+    "tshark.wireshark_list_interfaces": false,
+    "tshark.wireshark_capture": false,
+    "tshark.wireshark_filter_save": false,
+    "tshark.wireshark_editcap_trim": false,
+    "tshark.wireshark_editcap_split": false,
+    "tshark.wireshark_editcap_time_shift": false,
+    "tshark.wireshark_editcap_deduplicate": false,
+    "tshark.wireshark_aggregate": false,
+    "tshark.wireshark_stats_protocol_hierarchy": true,
+    "tshark.wireshark_stats_endpoints": false,
+    "tshark.wireshark_stats_conversations": true,
+    "tshark.wireshark_stats_io_graph": false,
+    "tshark.wireshark_stats_expert_info": true,
+    "tshark.wireshark_stats_service_response_time": false,
+    "tshark.wireshark_get_packet_list": true,
+    "tshark.wireshark_get_packet_details": true,
+    "tshark.wireshark_get_packet_bytes": false,
+    "tshark.wireshark_get_packet_context": false,
+    "tshark.wireshark_read_packets": false,
+    "tshark.wireshark_extract_fields": true,
+    "tshark.wireshark_search_packets": true,
+    "tshark.wireshark_follow_stream": false,
+    "tshark.wireshark_quick_analysis": false,
+    "tshark.wireshark_decode_as": false,
+    "tshark.wireshark_set_protocol_prefs": false,
+    "tshark.wireshark_decrypt_tls": false,
+    "tshark.wireshark_decrypt_wpa": false,
+    "tshark.wireshark_extract_frames": false,
+    "tshark.wireshark_flow_graph": false,
+    "tshark.wireshark_analyze_protocol": false,
+    "tshark.wireshark_analyze_tcp_health": false,
+    "tshark.wireshark_detect_arp_spoofing": false,
+    "tshark.wireshark_detect_beaconing": false,
+    "tshark.wireshark_detect_dns_tunnel": false,
+    "tshark.wireshark_detect_dos_attack": false,
+    "tshark.wireshark_detect_exfiltration": false,
+    "tshark.wireshark_detect_port_scan": false,
+    "tshark.wireshark_detect_protocol_anomalies": false,
+    "tshark.wireshark_export_objects": false,
+    "tshark.wireshark_extract_credentials": false,
+    "tshark.wireshark_extract_dns_queries": false,
+    "tshark.wireshark_extract_fingerprints": false,
+    "tshark.wireshark_extract_http_requests": false,
+    "tshark.wireshark_geoip_enrich": false,
+    "tshark.wireshark_scan_file_signatures": false,
+    "tshark.wireshark_verify_ssl_decryption": false,
+    "tshark.wireshark_yara_scan": false,
+    "tshark.wireshark_open_file": true
+  },
+  "contextSettings": {
+    "retainContext": true
+  },
+  "modelSettings": {
+    "thinkingMode": true,
+    "showThinking": true,
+    "reasoningEffort": "medium"
+  },
+  "agentSettings": {
+    "loopLimit": 7
+  },
+  "modelConfig": {
+    "system_prompt": "",
+    "num_keep": null,
+    "seed": 42,
+    "num_predict": null,
+    "top_k": null,
+    "top_p": null,
+    "min_p": null,
+    "typical_p": null,
+    "repeat_last_n": null,
+    "temperature": 0.1,
+    "repeat_penalty": null,
+    "presence_penalty": null,
+    "frequency_penalty": null,
+    "stop": null,
+    "num_ctx": 8192,
+    "num_batch": null
+  },
+  "displaySettings": {
+    "showToolExecution": true,
+    "showMetrics": false,
+    "answerRenderMode": "markdown"
+  },
+  "inputSettings": {
+    "inputMode": "single"
+  },
+  "hilSettings": {
+    "enabled": true
+  }
+}

@@ -52,7 +52,7 @@ y como no sabe decir "se me olvidó", rellena. Culparlo de eso sería injusto.
 
 ```bash
 ollama create triton-analista -f setup/Modelfile
-ollmcp --model triton-analista --servers-json setup/mcp-config.minimo.json
+ollmcp -j setup/mcp-config.minimo.json
 ```
 
 > **Construir la variante no basta.** `ollmcp` lleva su propia configuración de

@@ -23,10 +23,29 @@ inyección son igual de necesarios.
 En la versión pública, esos tres archivos no son una fuga: son lo que hace útil
 al repositorio.
 
-El único riesgo real —que los participantes del summit lleguen a las respuestas
-antes de la sesión— **se resuelve por temporalidad, no por ocultamiento**: el
-repositorio permanece privado hasta que la sesión termine. Después, las
-respuestas ya no comprometen nada.
+El único riesgo real es que los participantes del summit lleguen a las
+respuestas antes de la sesión. El plan original lo resolvía **por temporalidad,
+no por ocultamiento**: mantener el repositorio privado hasta que la sesión
+terminara.
+
+### Lo que se hizo en realidad
+
+**El repositorio se publicó el 12 de octubre de 2026, antes de impartir el
+taller.** Fue una decisión deliberada, tomada sabiendo que la rúbrica y la guía
+del instructor quedan al alcance de cualquier participante que las busque.
+
+Lo que eso implica para la sesión:
+
+- Un participante que haya leído `docs/03-rubrica.md` llega sabiendo que el
+  hallazgo es el `keyState` y que el `Run program` final fue rechazado. El
+  criterio de la trama 892 queda expuesto. Los demás criterios de peso alto en
+  *Cómo calificar* (anclaje con trama y comando, cómo llegaron al dato, los
+  modos de falla) se califican por el **proceso**, y la rúbrica no lo hace por
+  ellos: hay que preguntarles cómo llegaron, no sólo qué encontraron.
+- No se anuncia el repositorio antes de la sesión. Publicar no es lo mismo que
+  difundir.
+- El tag `v1.0-summit` se creó al publicar. Si el material cambia antes del
+  taller, el tag se mueve al commit que realmente se imparta (ver abajo).
 
 Esconder los letreros manteniendo los archivos habría sido seguridad por
 oscuridad: cualquiera que clone el repositorio tiene los documentos completos,
@@ -36,8 +55,8 @@ y el historial de commits los delata en un minuto.
 
 ## Antes de publicar
 
-- [ ] **La sesión del summit ya ocurrió.** Es la condición que habilita todo lo
-      demás. No publicar antes.
+- [x] ~~**La sesión del summit ya ocurrió.**~~ Se omitió a propósito; ver
+      *Lo que se hizo en realidad*.
 - [ ] Revisar la descripción del repositorio: que diga qué es y para quién, y
       que no tenga erratas. Es lo primero que lee alguien que llega desde una
       búsqueda. Se edita en la página principal del repositorio → columna
@@ -100,8 +119,15 @@ Y para que se encuentre:
 
 ## Lo que NO hay que hacer
 
-**No publicar antes de que termine la sesión.** Es la única regla que importa
-de todo este documento.
+**No difundir el repositorio antes de que termine la sesión.** Ya es público,
+pero enlazarlo en redes, correos a participantes o diapositivas previas acerca
+las respuestas a quien todavía no ha tomado el taller.
+
+**No dejar el tag en un commit que no se impartió.** Si el material cambia
+antes de la sesión, mover el tag al commit final:
+
+      git tag -f -a v1.0-summit -m "Versión impartida en CyberForce Summit 2026"
+      git push -f origin v1.0-summit
 
 **No borrar los archivos del instructor para "proteger" el taller.** Ya ocurrió;
 protegerlo no significa nada, y sin ellos el repositorio deja de servir para lo
